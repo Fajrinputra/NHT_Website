@@ -2,185 +2,168 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff } from 'lucide-react';
-import { register as apiRegister } from '../../api/authApi';
-import PageHeader from '../../components/layout/PageHeader';
+import { register as registerApi } from '../../api/authApi';
+import AuthLayout from '../../components/layout/AuthLayout';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
   const [apiError, setApiError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
 
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
+    watch,
   } = useForm();
 
-  const kataSandiValue = watch('kataSandi');
+  const passwordValue = watch('kataSandi', '');
 
   const onSubmit = async (data) => {
     setApiError('');
+    setSuccessMsg('');
     setIsLoading(true);
     try {
-      await apiRegister({
+      await registerApi({
         namaLengkap: data.namaLengkap,
         nomorTelepon: data.nomorTelepon,
         kataSandi: data.kataSandi,
-        konfirmasiKataSandi: data.konfirmasiKataSandi,
+        email: data.email,
+        nik: data.nik,
+        alamat: data.alamat,
       });
-      navigate('/menunggu-verifikasi', { replace: true });
+      setSuccessMsg('Pendaftaran berhasil! Silakan tunggu verifikasi admin.');
+      setTimeout(() => {
+        navigate('/login');
+      }, 3000);
     } catch (err) {
-      setApiError(err.response?.data?.error || 'Terjadi kesalahan, coba lagi');
+      setApiError(err.response?.data?.error || 'Pendaftaran gagal, coba lagi');
     } finally {
       setIsLoading(false);
     }
   };
 
+  if (successMsg) {
+    return (
+      <AuthLayout title="Pendaftaran Berhasil!">
+        <div className="bg-green-50 text-green-700 p-6 rounded-2xl text-center border border-green-100">
+          <p className="font-bold mb-2">Terima kasih telah mendaftar.</p>
+          <p className="text-sm">Tim kami akan memverifikasi akun Anda. Anda akan dialihkan ke halaman login...</p>
+        </div>
+      </AuthLayout>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-surface">
-      <PageHeader title="Daftar Akun" onBack={() => navigate('/login')} />
+    <AuthLayout 
+      title="Daftar Akun Baru" 
+      subtitle={
+        <>
+          Sudah punya akun?{' '}
+          <Link to="/login" className="text-primary-600 font-semibold hover:underline">
+            Masuk di sini
+          </Link>
+        </>
+      }
+    >
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {apiError && (
+          <div className="bg-red-50 border border-red-100 text-red-600 text-sm px-4 py-3 rounded-xl flex items-center gap-2">
+            <span className="w-1.5 h-1.5 bg-red-500 rounded-full flex-shrink-0" />
+            {apiError}
+          </div>
+        )}
 
-      <div className="px-6 py-6 max-w-sm mx-auto lg:max-w-md">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* API Error */}
-          {apiError && (
-            <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl">
-              {apiError}
-            </div>
-          )}
-
-          {/* Nama Lengkap */}
-          <div>
-            <label htmlFor="namaLengkap" className="input-label">Nama Lengkap</label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-gray-700">Nama Lengkap</label>
             <input
-              id="namaLengkap"
               type="text"
-              placeholder="Masukkan nama lengkap Anda"
-              className={`input-field ${errors.namaLengkap ? 'border-red-400' : ''}`}
-              {...register('namaLengkap', {
-                required: 'Nama lengkap wajib diisi',
-                minLength: { value: 2, message: 'Nama minimal 2 karakter' },
-              })}
+              placeholder="Sesuai KTP"
+              className={`w-full px-4 py-3 bg-gray-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all ${
+                errors.namaLengkap ? 'border-red-400 focus:border-red-400' : 'border-gray-200 focus:border-primary-500'
+              }`}
+              {...register('namaLengkap', { required: 'Wajib diisi' })}
             />
-            {errors.namaLengkap && <p className="input-error">{errors.namaLengkap.message}</p>}
+            {errors.namaLengkap && <p className="text-xs text-red-500 ml-1">{errors.namaLengkap.message}</p>}
           </div>
 
-          {/* Nomor Telepon */}
-          <div>
-            <label htmlFor="nomorTelepon" className="input-label">Nomor Telepon</label>
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-gray-700">Nomor Telepon</label>
             <input
-              id="nomorTelepon"
               type="tel"
-              placeholder="Contoh: 08123456789"
-              className={`input-field ${errors.nomorTelepon ? 'border-red-400' : ''}`}
-              {...register('nomorTelepon', {
-                required: 'Nomor telepon wajib diisi',
-                minLength: { value: 10, message: 'Minimal 10 digit' },
-                maxLength: { value: 15, message: 'Maksimal 15 digit' },
-              })}
+              placeholder="08xxxxxxxxxx"
+              className={`w-full px-4 py-3 bg-gray-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all ${
+                errors.nomorTelepon ? 'border-red-400 focus:border-red-400' : 'border-gray-200 focus:border-primary-500'
+              }`}
+              {...register('nomorTelepon', { required: 'Wajib diisi' })}
             />
-            {errors.nomorTelepon && <p className="input-error">{errors.nomorTelepon.message}</p>}
+            {errors.nomorTelepon && <p className="text-xs text-red-500 ml-1">{errors.nomorTelepon.message}</p>}
           </div>
+        </div>
 
-          {/* Kata Sandi */}
-          <div>
-            <label htmlFor="kataSandi" className="input-label">Kata Sandi</label>
-            <div className="relative">
-              <input
-                id="kataSandi"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Buat kata sandi minimal 8 karakter"
-                className={`input-field pr-12 ${errors.kataSandi ? 'border-red-400' : ''}`}
-                {...register('kataSandi', {
-                  required: 'Kata sandi wajib diisi',
-                  minLength: { value: 8, message: 'Kata sandi minimal 8 karakter' },
-                })}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-            {errors.kataSandi && <p className="input-error">{errors.kataSandi.message}</p>}
-          </div>
-
-          {/* Konfirmasi Kata Sandi */}
-          <div>
-            <label htmlFor="konfirmasiKataSandi" className="input-label">Konfirmasi Kata Sandi</label>
-            <div className="relative">
-              <input
-                id="konfirmasiKataSandi"
-                type={showConfirm ? 'text' : 'password'}
-                placeholder="Ulangi kata sandi Anda"
-                className={`input-field pr-12 ${errors.konfirmasiKataSandi ? 'border-red-400' : ''}`}
-                {...register('konfirmasiKataSandi', {
-                  required: 'Konfirmasi kata sandi wajib diisi',
-                  validate: (val) => val === kataSandiValue || 'Kata sandi tidak cocok',
-                })}
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
-              >
-                {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-            {errors.konfirmasiKataSandi && (
-              <p className="input-error">{errors.konfirmasiKataSandi.message}</p>
-            )}
-          </div>
-
-          {/* Checkbox Syarat */}
-          <div className="flex items-start gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-gray-700">Email</label>
             <input
-              id="setuju"
-              type="checkbox"
-              className="mt-0.5 w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-400 accent-primary-600"
-              {...register('setuju', {
-                required: 'Anda harus menyetujui syarat & ketentuan',
-              })}
+              type="email"
+              placeholder="email@contoh.com"
+              className={`w-full px-4 py-3 bg-gray-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all ${
+                errors.email ? 'border-red-400 focus:border-red-400' : 'border-gray-200 focus:border-primary-500'
+              }`}
+              {...register('email', { required: 'Wajib diisi', pattern: { value: /^\S+@\S+$/i, message: 'Email tidak valid' } })}
             />
-            <label htmlFor="setuju" className="text-sm text-gray-600">
-              Saya menyetujui{' '}
-              <span className="text-primary-600 font-medium cursor-pointer hover:underline">
-                syarat &amp; ketentuan
-              </span>
-            </label>
+            {errors.email && <p className="text-xs text-red-500 ml-1">{errors.email.message}</p>}
           </div>
-          {errors.setuju && <p className="input-error -mt-2">{errors.setuju.message}</p>}
 
-          {/* Submit */}
-          <div className="pt-2">
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-gray-700">NIK (Nomor Induk Kependudukan)</label>
+            <input
+              type="text"
+              placeholder="16 digit NIK"
+              className={`w-full px-4 py-3 bg-gray-50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all ${
+                errors.nik ? 'border-red-400 focus:border-red-400' : 'border-gray-200 focus:border-primary-500'
+              }`}
+              {...register('nik', { required: 'Wajib diisi', minLength: { value: 16, message: 'NIK harus 16 digit' } })}
+            />
+            {errors.nik && <p className="text-xs text-red-500 ml-1">{errors.nik.message}</p>}
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="block text-sm font-semibold text-gray-700">Kata Sandi</label>
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Min. 6 karakter"
+              className={`w-full px-4 py-3 bg-gray-50 border rounded-xl text-sm pr-12 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all ${
+                errors.kataSandi ? 'border-red-400' : 'border-gray-200 focus:border-primary-500'
+              }`}
+              {...register('kataSandi', { required: 'Wajib diisi', minLength: { value: 6, message: 'Minimal 6 karakter' } })}
+            />
             <button
-              type="submit"
-              disabled={isLoading}
-              className="btn-primary"
-              id="btn-daftar"
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              {isLoading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  Mendaftarkan...
-                </span>
-              ) : 'Daftar'}
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
-        </form>
+          {errors.kataSandi && <p className="text-xs text-red-500 ml-1">{errors.kataSandi.message}</p>}
+        </div>
 
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Sudah punya akun?{' '}
-          <Link to="/login" className="text-primary-600 font-medium hover:underline">
-            Masuk
-          </Link>
-        </p>
-      </div>
-    </div>
+        <div className="pt-4">
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3.5 rounded-xl transition-all shadow-md hover:shadow-lg disabled:opacity-70"
+          >
+            {isLoading ? 'Memproses...' : 'Daftar Sekarang'}
+          </button>
+        </div>
+      </form>
+    </AuthLayout>
   );
 }

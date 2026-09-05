@@ -4,6 +4,7 @@ import ProtectedRoute from './ProtectedRoute';
 // Auth pages
 import LoginPage from '../pages/auth/LoginPage';
 import RegisterPage from '../pages/auth/RegisterPage';
+import LupaSandiPage from '../pages/auth/LupaSandiPage';
 import VerificationPendingPage from '../pages/auth/VerificationPendingPage';
 
 // Dashboard
@@ -37,8 +38,9 @@ export default function AppRoutes() {
   return (
     <Routes>
       {/* Auth */}
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/login" element={klien ? <Navigate to="/dashboard" /> : <LoginPage />} />
+      <Route path="/register" element={klien ? <Navigate to="/dashboard" /> : <RegisterPage />} />
+      <Route path="/lupa-sandi" element={klien ? <Navigate to="/dashboard" /> : <LupaSandiPage />} />
       <Route path="/menunggu-verifikasi" element={<VerificationPendingPage />} />
 
       {/* Protected */}
