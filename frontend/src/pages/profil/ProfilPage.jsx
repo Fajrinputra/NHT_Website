@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, LogOut, Lock, Phone, CreditCard, ChevronRight, Users, Baby, HandHeart, LogIn } from 'lucide-react';
+import { User, LogOut, Lock, Phone, CreditCard, ChevronRight, Users, Baby, HandHeart, LogIn, MessageCircle, Instagram } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import AppShell from '../../components/layout/AppShell';
 import PageHeader from '../../components/layout/PageHeader';
 import { changePassword } from '../../api/authApi';
 import { getProfil } from '../../api/profilApi';
 import { formatTanggal } from '../../utils/formatters';
+import { INSTAGRAM_URL, LINK_WA_KONTAK } from '../../constants/sosialMedia';
 
 export default function ProfilPage() {
   const { klien, logout } = useAuth();
@@ -153,6 +154,48 @@ export default function ProfilPage() {
             </div>
             <ChevronRight size={18} className="text-red-400" />
           </button>
+        </div>
+      </section>
+
+      {/* Kontak & Sosial Media */}
+      <section className="mt-6 mb-8">
+        <h3 className="text-sm font-bold text-gray-800 mb-3 px-1">Hubungi Kami</h3>
+        <div className="card p-0 divide-y divide-gray-100 overflow-hidden">
+          <a
+            href={LINK_WA_KONTAK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full p-4 flex items-center justify-between hover:bg-green-50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-[#25D366]/10 flex items-center justify-center text-[#25D366]">
+                <MessageCircle size={16} />
+              </div>
+              <div>
+                <span className="text-sm font-medium text-gray-700 block">WhatsApp Admin</span>
+                <span className="text-xs text-gray-400">0858-8180-1658</span>
+              </div>
+            </div>
+            <ChevronRight size={18} className="text-gray-400" />
+          </a>
+
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full p-4 flex items-center justify-between hover:bg-pink-50 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-pink-50 flex items-center justify-center text-pink-500">
+                <Instagram size={16} />
+              </div>
+              <div>
+                <span className="text-sm font-medium text-gray-700 block">Instagram</span>
+                <span className="text-xs text-gray-400">@nata_housetreatment</span>
+              </div>
+            </div>
+            <ChevronRight size={18} className="text-gray-400" />
+          </a>
         </div>
       </section>
 

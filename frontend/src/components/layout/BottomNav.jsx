@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Heart, Baby, User, Smile } from 'lucide-react';
+import { Home, Heart, Baby, User, Smile, MessageCircle, Instagram } from 'lucide-react';
+import { INSTAGRAM_URL, LINK_WA_KONTAK } from '../../constants/sosialMedia';
 
 const navItems = [
   { to: '/dashboard', icon: Home, label: 'Beranda' },
@@ -73,6 +74,29 @@ export default function BottomNav() {
             </NavLink>
           ))}
         </nav>
+
+        {/* Sosial Media — di bagian bawah sidebar */}
+        <div className="mt-auto pt-6 border-t border-gray-100">
+          <p className="text-[10px] text-gray-400 uppercase tracking-widest px-3 mb-2">Ikuti Kami</p>
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-all"
+          >
+            <Instagram size={18} />
+            Instagram
+          </a>
+          <a
+            href={LINK_WA_KONTAK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-green-50 hover:text-green-600 transition-all"
+          >
+            <MessageCircle size={18} />
+            WhatsApp
+          </a>
+        </div>
       </aside>
     </>
   );

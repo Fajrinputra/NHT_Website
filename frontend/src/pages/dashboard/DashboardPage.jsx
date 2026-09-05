@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Bell, Heart, Baby, Smile, CalendarDays, Search, ChevronRight, BookOpen } from 'lucide-react';
+import { Bell, Heart, Baby, Smile, CalendarDays, Search, ChevronRight, BookOpen, MessageCircle, Instagram } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { getArtikels } from '../../api/artikelApi';
 import AppShell from '../../components/layout/AppShell';
 import { formatTanggal } from '../../utils/formatters';
+import { INSTAGRAM_URL, LINK_WA_KONTAK } from '../../constants/sosialMedia';
 
 const menuItems = [
   {
@@ -177,6 +178,46 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+      </section>
+
+      {/* Sosial Media & Kontak */}
+      <section className="mt-8 mb-2">
+        <h3 className="text-base font-bold text-gray-800 mb-3">Hubungi & Ikuti Kami</h3>
+        <div className="grid grid-cols-2 gap-3">
+          {/* WhatsApp */}
+          <a
+            href={LINK_WA_KONTAK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 p-4 rounded-2xl bg-[#25D366]/10 border border-[#25D366]/20 hover:bg-[#25D366]/20 transition-colors group"
+            id="btn-kontak-wa"
+          >
+            <div className="w-10 h-10 rounded-xl bg-[#25D366] flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+              <MessageCircle size={20} className="text-white" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-gray-800">WhatsApp</p>
+              <p className="text-[11px] text-gray-500 leading-tight">Chat Admin Nata</p>
+            </div>
+          </a>
+
+          {/* Instagram */}
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-br from-pink-50 to-purple-50 border border-pink-100 hover:from-pink-100 hover:to-purple-100 transition-colors group"
+            id="btn-instagram"
+          >
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF] flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+              <Instagram size={20} className="text-white" />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-gray-800">Instagram</p>
+              <p className="text-[11px] text-gray-500 leading-tight">@nata_housetreatment</p>
+            </div>
+          </a>
+        </div>
       </section>
     </AppShell>
   );

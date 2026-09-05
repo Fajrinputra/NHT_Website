@@ -5,6 +5,7 @@ import AppShell from '../../components/layout/AppShell';
 import PageHeader from '../../components/layout/PageHeader';
 import { createBooking, getBookingHistory, getJadwalTersedia } from '../../api/bookingApi';
 import { formatTanggal } from '../../utils/formatters';
+import { buatLinkWABooking } from '../../constants/sosialMedia';
 
 const LAYANAN_OPTIONS = [
   { value: 'PIJAT_HAMIL', label: 'Pijat Hamil' },
@@ -124,7 +125,11 @@ export default function BookingPage() {
               
               <div className="space-y-3 max-w-xs mx-auto">
                 <a 
-                  href={`https://wa.me/6281234567890?text=Halo%20Admin%20Nata%2C%20saya%20ingin%20mengkonfirmasi%20pesanan%20${LAYANAN_OPTIONS.find(l => l.value === latestBooking.jenisLayanan)?.label}%20untuk%20tanggal%20${formatTanggal(latestBooking.tanggal)}%20jam%20${latestBooking.jam}.`}
+                  href={buatLinkWABooking(
+                    LAYANAN_OPTIONS.find(l => l.value === latestBooking.jenisLayanan)?.label,
+                    formatTanggal(latestBooking.tanggal),
+                    latestBooking.jam
+                  )}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 w-full py-3 bg-[#25D366] text-white rounded-xl text-sm font-bold hover:bg-[#1ebd5c] transition-colors shadow-sm"
@@ -262,7 +267,11 @@ export default function BookingPage() {
                 
                 {item.status === 'MENUNGGU_KONFIRMASI' && (
                   <a 
-                    href={`https://wa.me/6281234567890?text=Halo%20Admin%20Nata%2C%20saya%20ingin%20mengkonfirmasi%20pesanan%20${LAYANAN_OPTIONS.find(l => l.value === item.jenisLayanan)?.label}%20untuk%20tanggal%20${formatTanggal(item.tanggal)}%20jam%20${item.jam}.`}
+                    href={buatLinkWABooking(
+                      LAYANAN_OPTIONS.find(l => l.value === item.jenisLayanan)?.label,
+                      formatTanggal(item.tanggal),
+                      item.jam
+                    )}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-center gap-1.5 w-full py-2 bg-green-50 text-green-700 rounded-lg text-xs font-bold hover:bg-green-100 transition-colors mb-3"
