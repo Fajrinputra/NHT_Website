@@ -1,0 +1,18 @@
+# Git
+.git/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backend
+backend/.env
+backend/tmp/
+
+# Frontend
+frontend/.env
+frontend/node_modules/
+frontend/dist/
+
+# UI Design files (sudah ada di Downloads)
+*.png
