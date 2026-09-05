@@ -38,9 +38,9 @@ export default function AppRoutes() {
   return (
     <Routes>
       {/* Auth */}
-      <Route path="/login" element={klien ? <Navigate to="/dashboard" /> : <LoginPage />} />
-      <Route path="/register" element={klien ? <Navigate to="/dashboard" /> : <RegisterPage />} />
-      <Route path="/lupa-sandi" element={klien ? <Navigate to="/dashboard" /> : <LupaSandiPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/lupa-sandi" element={<LupaSandiPage />} />
       <Route path="/menunggu-verifikasi" element={<VerificationPendingPage />} />
 
       {/* Protected */}
