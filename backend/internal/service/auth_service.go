@@ -15,7 +15,7 @@ import (
 type AuthService interface {
 	Register(req *dto.RegisterRequest) (*dto.KlienResponse, error)
 	Login(req *dto.LoginRequest) (*dto.LoginResponse, error)
-	GetStatus(klienID string) (*dto.StatusResponse, error)
+	GetStatusByNomorTelepon(nomorTelepon string) (*dto.StatusResponse, error)
 	GetMe(klienID string) (*dto.KlienResponse, error)
 	ChangePassword(klienID string, req *dto.ChangePasswordRequest) error
 }
@@ -92,10 +92,10 @@ func (s *authService) Login(req *dto.LoginRequest) (*dto.LoginResponse, error) {
 	}, nil
 }
 
-func (s *authService) GetStatus(klienID string) (*dto.StatusResponse, error) {
-	klien, err := s.klienRepo.FindByID(klienID)
+func (s *authService) GetStatusByNomorTelepon(nomorTelepon string) (*dto.StatusResponse, error) {
+	klien, err := s.klienRepo.FindByNomorTelepon(nomorTelepon)
 	if err != nil {
-		return nil, errors.New("klien tidak ditemukan")
+		return nil, errors.New("nomor telepon tidak ditemukan")
 	}
 	return &dto.StatusResponse{StatusVerifikasi: string(klien.StatusVerifikasi)}, nil
 }

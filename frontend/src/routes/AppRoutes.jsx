@@ -15,6 +15,11 @@ import IbuHamilPage from '../pages/ibu-hamil/IbuHamilPage';
 
 // Anak & Bayi
 import BayiPage from '../pages/bayi/BayiPage';
+import AnakPage from '../pages/anak/AnakPage';
+import GrafikPertumbuhanPage from '../pages/anak/GrafikPertumbuhanPage';
+import TabelImunisasiPage from '../pages/anak/TabelImunisasiPage';
+import DenverIIPage from '../pages/anak/DenverIIPage';
+import CatatanHarianPage from '../pages/shared/CatatanHarianPage';
 
 // Booking Homecare
 import BookingPage from '../pages/booking/BookingPage';
@@ -47,7 +52,20 @@ export default function AppRoutes() {
       <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
       <Route path="/ibu-hamil" element={<ProtectedRoute><IbuHamilPage /></ProtectedRoute>} />
       <Route path="/bayi" element={<ProtectedRoute><BayiPage /></ProtectedRoute>} />
-      <Route path="/anak" element={<ProtectedRoute><BayiPage /></ProtectedRoute>} />
+      <Route path="/anak" element={<ProtectedRoute><AnakPage /></ProtectedRoute>} />
+      
+      {/* KIA Digital (Bayi & Anak) */}
+      <Route path="/bayi/pertumbuhan/:id" element={<ProtectedRoute><GrafikPertumbuhanPage /></ProtectedRoute>} />
+      <Route path="/bayi/imunisasi/:id" element={<ProtectedRoute><TabelImunisasiPage /></ProtectedRoute>} />
+      <Route path="/bayi/denver/:id" element={<ProtectedRoute><DenverIIPage /></ProtectedRoute>} />
+      <Route path="/anak/pertumbuhan/:id" element={<ProtectedRoute><GrafikPertumbuhanPage /></ProtectedRoute>} />
+      <Route path="/anak/imunisasi/:id" element={<ProtectedRoute><TabelImunisasiPage /></ProtectedRoute>} />
+      <Route path="/anak/denver/:id" element={<ProtectedRoute><DenverIIPage /></ProtectedRoute>} />
+
+      {/* Catatan Harian */}
+      <Route path="/ibu-hamil/catatan-harian" element={<ProtectedRoute><CatatanHarianPage konteks="IBU_HAMIL" /></ProtectedRoute>} />
+      <Route path="/bayi/catatan-harian/:id" element={<ProtectedRoute><CatatanHarianPage konteks="BAYI" /></ProtectedRoute>} />
+      <Route path="/anak/catatan-harian/:id" element={<ProtectedRoute><CatatanHarianPage konteks="ANAK" /></ProtectedRoute>} />
       <Route path="/booking" element={<ProtectedRoute><BookingPage /></ProtectedRoute>} />
       <Route path="/artikel" element={<ProtectedRoute><ArtikelPage /></ProtectedRoute>} />
       <Route path="/artikel/:id" element={<ProtectedRoute><ArtikelDetailPage /></ProtectedRoute>} />

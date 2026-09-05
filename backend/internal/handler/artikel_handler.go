@@ -29,23 +29,13 @@ func (h *ArtikelHandler) GetArtikels(c *gin.Context) {
 	searchQuery := c.Query("q")
 	kategori := c.Query("kategori")
 
-	if searchQuery != "" {
-		artikels, err := h.artikelService.SearchArtikels(searchQuery)
+	if searchQuery != "" || kategori != "" {
+		artikels, err := h.artikelService.GetArtikels(searchQuery, kategori)
 		if err != nil {
 			utils.ResponseError(c, http.StatusInternalServerError, err.Error())
 			return
 		}
 		utils.ResponseSuccess(c, http.StatusOK, "Hasil pencarian artikel", artikels)
-		return
-	}
-
-	if kategori != "" {
-		artikels, err := h.artikelService.GetLatestByKategori(kategori, limit)
-		if err != nil {
-			utils.ResponseError(c, http.StatusInternalServerError, err.Error())
-			return
-		}
-		utils.ResponseSuccess(c, http.StatusOK, "Artikel berhasil diambil", artikels)
 		return
 	}
 

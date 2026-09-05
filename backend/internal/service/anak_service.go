@@ -10,9 +10,12 @@ import (
 )
 
 type AnakService interface {
-	CreateAnak(klienID string, req *dto.CreateAnakRequest) (*models.Anak, error)
-	GetAnakByKlienID(klienID string) ([]models.Anak, error)
-	UpdateAnak(anakID string, klienID string, req *dto.UpdateAnakRequest) (*models.Anak, error)
+	CreateAnak(klienID string, req *dto.CreateAnakRequest) (*dto.AnakResponse, error)
+	GetAnakByKlienID(klienID string) ([]dto.AnakResponse, error)
+	UpdateAnak(anakID string, klienID string, req *dto.UpdateAnakRequest) (*dto.AnakResponse, error)
+	GetGrafikPertumbuhan(anakID string, klienID string) ([]models.GrafikPertumbuhan, error)
+	GetCatatanImunisasi(anakID string, klienID string) ([]models.CatatanImunisasi, error)
+	GetHasilDenverII(anakID string, klienID string) ([]models.HasilDenverII, error)
 }
 
 type anakService struct {
@@ -23,7 +26,7 @@ func NewAnakService(repo repository.AnakRepository) AnakService {
 	return &anakService{anakRepo: repo}
 }
 
-func (s *anakService) CreateAnak(klienID string, req *dto.CreateAnakRequest) (*models.Anak, error) {
+func (s *anakService) CreateAnak(klienID string, req *dto.CreateAnakRequest) (*dto.AnakResponse, error) {
 	tanggalLahir, err := time.Parse("2006-01-02", req.TanggalLahir)
 	if err != nil {
 		return nil, errors.New("format tanggal lahir tidak valid, gunakan YYYY-MM-DD")
@@ -43,18 +46,23 @@ func (s *anakService) CreateAnak(klienID string, req *dto.CreateAnakRequest) (*m
 		return nil, errors.New("gagal menyimpan data anak")
 	}
 
-	return anak, nil
+	return s.mapToDTO(anak), nil
 }
 
-func (s *anakService) GetAnakByKlienID(klienID string) ([]models.Anak, error) {
+func (s *anakService) GetAnakByKlienID(klienID string) ([]dto.AnakResponse, error) {
 	anaks, err := s.anakRepo.FindByKlienID(klienID)
 	if err != nil {
 		return nil, errors.New("gagal mengambil data anak")
 	}
-	return anaks, nil
+	
+	var responses []dto.AnakResponse
+	for _, a := range anaks {
+		responses = append(responses, *s.mapToDTO(&a))
+	}
+	return responses, nil
 }
 
-func (s *anakService) UpdateAnak(anakID string, klienID string, req *dto.UpdateAnakRequest) (*models.Anak, error) {
+func (s *anakService) UpdateAnak(anakID string, klienID string, req *dto.UpdateAnakRequest) (*dto.AnakResponse, error) {
 	anak, err := s.anakRepo.FindByID(anakID)
 	if err != nil {
 		return nil, errors.New("data anak tidak ditemukan")
@@ -90,5 +98,59 @@ func (s *anakService) UpdateAnak(anakID string, klienID string, req *dto.UpdateA
 		return nil, errors.New("gagal memperbarui data anak")
 	}
 
-	return anak, nil
+	return s.mapToDTO(anak), nil
+}
+
+func (s *anakService) checkAccess(anakID, klienID string) error {
+	anak, err := s.anakRepo.FindByID(anakID)
+	if err != nil {
+		return errors.New("data anak tidak ditemukan")
+	}
+	if anak.KlienID != klienID {
+		return errors.New("tidak memiliki akses ke data anak ini")
+	}
+	return nil
+}
+
+func (s *anakService) GetGrafikPertumbuhan(anakID string, klienID string) ([]models.GrafikPertumbuhan, error) {
+	if err := s.checkAccess(anakID, klienID); err != nil {
+		return nil, err
+	}
+	return s.anakRepo.GetGrafikPertumbuhan(anakID)
+}
+
+func (s *anakService) GetCatatanImunisasi(anakID string, klienID string) ([]models.CatatanImunisasi, error) {
+	if err := s.checkAccess(anakID, klienID); err != nil {
+		return nil, err
+	}
+	return s.anakRepo.GetCatatanImunisasi(anakID)
+}
+
+func (s *anakService) GetHasilDenverII(anakID string, klienID string) ([]models.HasilDenverII, error) {
+	if err := s.checkAccess(anakID, klienID); err != nil {
+		return nil, err
+	}
+	return s.anakRepo.GetHasilDenverII(anakID)
+}
+
+func (s *anakService) mapToDTO(a *models.Anak) *dto.AnakResponse {
+	usiaBulan := utils.HitungUsiaAnak(a.TanggalLahir)
+	tipeAnak := "BAYI"
+	if usiaBulan >= 24 {
+		tipeAnak = "ANAK"
+	}
+
+	return &dto.AnakResponse{
+		ID:                 a.ID,
+		KlienID:            a.KlienID,
+		Nama:               a.Nama,
+		TanggalLahir:       a.TanggalLahir,
+		JenisKelamin:       string(a.JenisKelamin),
+		BeratLahir:         a.BeratLahir,
+		PanjangLahir:       a.PanjangLahir,
+		LingkarKepalaLahir: a.LingkarKepalaLahir,
+		UsiaBulan:          usiaBulan,
+		TipeAnak:           tipeAnak,
+		CreatedAt:          a.CreatedAt,
+	}
 }

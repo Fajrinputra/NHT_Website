@@ -11,6 +11,7 @@ type ArtikelRepository interface {
 	FindByID(id string) (*models.Artikel, error)
 	Search(query string) ([]models.Artikel, error)
 	FindAll() ([]models.Artikel, error)
+	FindWithFilters(query string, kategori string) ([]models.Artikel, error)
 }
 
 type artikelRepository struct {
@@ -53,5 +54,22 @@ func (r *artikelRepository) Search(query string) ([]models.Artikel, error) {
 func (r *artikelRepository) FindAll() ([]models.Artikel, error) {
 	var artikels []models.Artikel
 	err := r.db.Order("created_at DESC").Find(&artikels).Error
+	return artikels, err
+}
+
+func (r *artikelRepository) FindWithFilters(query string, kategori string) ([]models.Artikel, error) {
+	var artikels []models.Artikel
+	db := r.db
+
+	if kategori != "" && kategori != "SEMUA" {
+		db = db.Where("kategori = ?", kategori)
+	}
+
+	if query != "" {
+		pattern := "%" + query + "%"
+		db = db.Where("judul ILIKE ? OR cuplikan ILIKE ?", pattern, pattern)
+	}
+
+	err := db.Order("created_at DESC").Find(&artikels).Error
 	return artikels, err
 }

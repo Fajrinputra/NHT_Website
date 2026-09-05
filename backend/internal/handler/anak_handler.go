@@ -71,3 +71,48 @@ func (h *AnakHandler) UpdateAnak(c *gin.Context) {
 
 	utils.ResponseSuccess(c, http.StatusOK, "Data anak berhasil diperbarui", anak)
 }
+
+// GetGrafikPertumbuhan godoc
+// GET /api/v1/anak/:id/grafik-pertumbuhan
+func (h *AnakHandler) GetGrafikPertumbuhan(c *gin.Context) {
+	klienID := c.GetString("klienID")
+	anakID := c.Param("id")
+
+	grafik, err := h.anakService.GetGrafikPertumbuhan(anakID, klienID)
+	if err != nil {
+		utils.ResponseError(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	utils.ResponseSuccess(c, http.StatusOK, "Data grafik pertumbuhan berhasil diambil", grafik)
+}
+
+// GetCatatanImunisasi godoc
+// GET /api/v1/anak/:id/imunisasi
+func (h *AnakHandler) GetCatatanImunisasi(c *gin.Context) {
+	klienID := c.GetString("klienID")
+	anakID := c.Param("id")
+
+	imunisasi, err := h.anakService.GetCatatanImunisasi(anakID, klienID)
+	if err != nil {
+		utils.ResponseError(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	utils.ResponseSuccess(c, http.StatusOK, "Data catatan imunisasi berhasil diambil", imunisasi)
+}
+
+// GetHasilDenverII godoc
+// GET /api/v1/anak/:id/denver-ii
+func (h *AnakHandler) GetHasilDenverII(c *gin.Context) {
+	klienID := c.GetString("klienID")
+	anakID := c.Param("id")
+
+	denver, err := h.anakService.GetHasilDenverII(anakID, klienID)
+	if err != nil {
+		utils.ResponseError(c, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	utils.ResponseSuccess(c, http.StatusOK, "Data hasil Denver II berhasil diambil", denver)
+}

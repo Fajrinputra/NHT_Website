@@ -54,11 +54,15 @@ func (h *AuthHandler) Login(c *gin.Context) {
 }
 
 // GetStatus godoc
-// GET /api/v1/auth/status — digunakan oleh VerificationPendingPage untuk polling
+// GET /api/v1/auth/status?nomorTelepon=08xxx — PUBLIK, tidak perlu JWT
 func (h *AuthHandler) GetStatus(c *gin.Context) {
-	klienID := c.GetString("klienID")
+	nomorTelepon := c.Query("nomorTelepon")
+	if nomorTelepon == "" {
+		utils.ResponseError(c, http.StatusBadRequest, "parameter nomorTelepon wajib diisi")
+		return
+	}
 
-	status, err := h.authService.GetStatus(klienID)
+	status, err := h.authService.GetStatusByNomorTelepon(nomorTelepon)
 	if err != nil {
 		utils.ResponseError(c, http.StatusNotFound, err.Error())
 		return

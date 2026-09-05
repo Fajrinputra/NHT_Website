@@ -23,18 +23,27 @@ func SetupRouter() *gin.Engine {
 	anakRepo := repository.NewAnakRepository(database.DB)
 	bookingRepo := repository.NewBookingRepository(database.DB)
 	jadwalTersediaRepo := repository.NewJadwalTersediaRepository(database.DB)
+	catatanHarianRepo := repository.NewCatatanHarianRepository(database.DB)
+	notifRepo := repository.NewNotifikasiRepository(database.DB)
+	suamiRepo := repository.NewSuamiRepository(database.DB)
 
 	authSvc := service.NewAuthService(klienRepo)
 	ibuHamilSvc := service.NewIbuHamilService(ibuRepo)
 	artikelSvc := service.NewArtikelService(artikelRepo)
 	anakSvc := service.NewAnakService(anakRepo)
-	bookingSvc := service.NewBookingService(bookingRepo, jadwalTersediaRepo)
+	bookingSvc := service.NewBookingService(bookingRepo, jadwalTersediaRepo, notifRepo)
+	catatanHarianSvc := service.NewCatatanHarianService(catatanHarianRepo)
+	notifSvc := service.NewNotifikasiService(notifRepo)
+	profilSvc := service.NewProfilService(klienRepo, ibuRepo, suamiRepo, anakRepo)
 
 	authHandler := handler.NewAuthHandler(authSvc)
 	ibuHamilHandler := handler.NewIbuHamilHandler(ibuHamilSvc)
 	artikelHandler := handler.NewArtikelHandler(artikelSvc)
 	anakHandler := handler.NewAnakHandler(anakSvc)
 	bookingHandler := handler.NewBookingHandler(bookingSvc)
+	catatanHarianHandler := handler.NewCatatanHarianHandler(catatanHarianSvc)
+	notifHandler := handler.NewNotifikasiHandler(notifSvc)
+	profilHandler := handler.NewProfilHandler(profilSvc)
 
 	// API v1 group
 	v1 := r.Group("/api/v1")
@@ -44,11 +53,11 @@ func SetupRouter() *gin.Engine {
 		{
 			auth.POST("/register", authHandler.Register)
 			auth.POST("/login", authHandler.Login)
+			auth.GET("/status", authHandler.GetStatus) // PUBLIK — polling verifikasi
 			// Protected auth routes
 			authProtected := auth.Group("")
 			authProtected.Use(middleware.AuthMiddleware())
 			{
-				authProtected.GET("/status", authHandler.GetStatus)
 				authProtected.GET("/me", authHandler.GetMe)
 				authProtected.PUT("/password", authHandler.ChangePassword)
 			}
@@ -70,11 +79,27 @@ func SetupRouter() *gin.Engine {
 			protected.POST("/anak", anakHandler.CreateAnak)
 			protected.GET("/anak", anakHandler.GetAnak)
 			protected.PUT("/anak/:id", anakHandler.UpdateAnak)
+			protected.GET("/anak/:id/grafik-pertumbuhan", anakHandler.GetGrafikPertumbuhan)
+			protected.GET("/anak/:id/imunisasi", anakHandler.GetCatatanImunisasi)
+			protected.GET("/anak/:id/denver-ii", anakHandler.GetHasilDenverII)
 
 			// Booking Homecare
 			protected.POST("/booking", bookingHandler.CreateBooking)
 			protected.GET("/booking", bookingHandler.GetBookingHistory)
 			protected.GET("/booking/jadwal", bookingHandler.GetJadwalTersedia)
+
+			// Catatan Harian
+			protected.POST("/catatan-harian", catatanHarianHandler.CreateCatatan)
+			protected.GET("/catatan-harian", catatanHarianHandler.GetCatatan)
+			protected.PUT("/catatan-harian/:id", catatanHarianHandler.UpdateCatatan)
+
+			// Notifikasi
+			protected.GET("/notifikasi", notifHandler.GetNotifikasi)
+			protected.PUT("/notifikasi/:id/read", notifHandler.MarkAsRead)
+			protected.GET("/notifikasi/unread-count", notifHandler.GetUnreadCount)
+
+			// Profil
+			protected.GET("/profil", profilHandler.GetProfil)
 		}
 	}
 

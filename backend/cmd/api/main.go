@@ -27,6 +27,9 @@ func main() {
 	// Koneksi database + AutoMigrate semua tabel
 	database.Connect(cfg.DatabaseURL)
 
+	// Seed data (khusus development/testing)
+	database.SeedKIAData()
+
 	// Setup router dan jalankan server
 	r := router.SetupRouter()
 

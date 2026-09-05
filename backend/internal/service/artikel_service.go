@@ -13,6 +13,7 @@ type ArtikelService interface {
 	GetArtikelByID(id string) (*dto.ArtikelDetailResponse, error)
 	SearchArtikels(query string) ([]dto.ArtikelResponse, error)
 	GetAllArtikels() ([]dto.ArtikelResponse, error)
+	GetArtikels(query string, kategori string) ([]dto.ArtikelResponse, error)
 }
 
 type artikelService struct {
@@ -69,6 +70,14 @@ func (s *artikelService) GetAllArtikels() ([]dto.ArtikelResponse, error) {
 	artikels, err := s.artikelRepo.FindAll()
 	if err != nil {
 		return nil, errors.New("gagal mengambil semua artikel")
+	}
+	return toArtikelResponseList(artikels), nil
+}
+
+func (s *artikelService) GetArtikels(query string, kategori string) ([]dto.ArtikelResponse, error) {
+	artikels, err := s.artikelRepo.FindWithFilters(query, kategori)
+	if err != nil {
+		return nil, errors.New("gagal mengambil artikel")
 	}
 	return toArtikelResponseList(artikels), nil
 }

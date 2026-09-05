@@ -1,18 +1,34 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, LogOut, Lock, Phone, CreditCard, ChevronRight } from 'lucide-react';
+import { User, LogOut, Lock, Phone, CreditCard, ChevronRight, Users, Baby, HandHeart, LogIn } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import AppShell from '../../components/layout/AppShell';
 import PageHeader from '../../components/layout/PageHeader';
 import { changePassword } from '../../api/authApi';
+import { getProfil } from '../../api/profilApi';
+import { formatTanggal } from '../../utils/formatters';
 
 export default function ProfilPage() {
   const { klien, logout } = useAuth();
   const navigate = useNavigate();
   
+  const [profilData, setProfilData] = useState(null);
+  const [isLoadingProfil, setIsLoadingProfil] = useState(true);
+
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [passwordForm, setPasswordForm] = useState({ passwordLama: '', passwordBaru: '' });
   const [passwordStatus, setPasswordStatus] = useState({ loading: false, error: '', success: '' });
+
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (klien) {
+      getProfil()
+        .then(res => setProfilData(res.data.data))
+        .catch(() => {})
+        .finally(() => setIsLoadingProfil(false));
+    }
+  }, [klien]);
 
   const handleLogout = () => {
     logout();
@@ -54,6 +70,32 @@ export default function ProfilPage() {
             <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
             Terverifikasi
           </div>
+        </div>
+      </section>
+
+      {/* Keluarga List */}
+      <section className="mt-6">
+        <h3 className="text-sm font-bold text-gray-800 mb-3 px-1 flex items-center gap-2">
+          <Users size={16} className="text-primary-600" /> Anggota Keluarga
+        </h3>
+        <div className="card space-y-3 p-4">
+          {isLoadingProfil ? (
+            <div className="animate-pulse flex gap-3 h-12 bg-gray-100 rounded-lg"></div>
+          ) : profilData?.keluarga?.length > 0 ? (
+            profilData.keluarga.map((kel, idx) => (
+              <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${kel.peran === 'Ibu' ? 'bg-pink-100 text-pink-500' : (kel.peran === 'Suami' ? 'bg-blue-100 text-blue-500' : 'bg-primary-100 text-primary-500')}`}>
+                  {kel.peran === 'Ibu' ? <HandHeart size={20} /> : (kel.peran === 'Suami' ? <User size={20} /> : <Baby size={20} />)}
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-gray-800 text-sm">{kel.nama}</p>
+                  <p className="text-xs text-gray-500">{kel.peran} {kel.tanggalLahir ? `• ${formatTanggal(kel.tanggalLahir)}` : ''}</p>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500 text-center py-4">Belum ada data keluarga.</p>
+          )}
         </div>
       </section>
 
@@ -100,7 +142,7 @@ export default function ProfilPage() {
           </button>
           
           <button 
-            onClick={handleLogout}
+            onClick={() => setIsLogoutModalOpen(true)}
             className="w-full p-4 flex items-center justify-between hover:bg-red-50 transition-colors text-left"
           >
             <div className="flex items-center gap-3">
@@ -170,6 +212,36 @@ export default function ProfilPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Konfirmasi Logout */}
+      {isLogoutModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl w-full max-w-sm p-6 shadow-xl text-center">
+            <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <LogOut size={32} />
+            </div>
+            <h3 className="font-bold text-lg text-gray-800 mb-2">Keluar Aplikasi?</h3>
+            <p className="text-sm text-gray-500 mb-6">Anda harus login kembali untuk masuk ke akun Anda.</p>
+            
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setIsLogoutModalOpen(false)}
+                className="flex-1 btn-outline py-3"
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex-1 bg-red-500 text-white font-bold rounded-xl py-3 hover:bg-red-600 transition-colors"
+              >
+                Ya, Keluar
+              </button>
+            </div>
           </div>
         </div>
       )}

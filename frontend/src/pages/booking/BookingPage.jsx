@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Calendar as CalendarIcon, Clock, HeartHandshake, FileText, CheckCircle2 } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, HeartHandshake, FileText, CheckCircle2, MessageCircle } from 'lucide-react';
 import AppShell from '../../components/layout/AppShell';
 import PageHeader from '../../components/layout/PageHeader';
 import { createBooking, getBookingHistory, getJadwalTersedia } from '../../api/bookingApi';
@@ -20,6 +20,7 @@ export default function BookingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [latestBooking, setLatestBooking] = useState(null);
 
   const { register, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm();
   
@@ -60,11 +61,13 @@ export default function BookingPage() {
     setApiError('');
     setIsLoading(true);
     try {
-      await createBooking(data);
+      const payload = { ...data };
+      const response = await createBooking(payload);
+      setLatestBooking({
+        ...payload,
+        id: response.data?.data?.id
+      });
       setIsSuccess(true);
-      reset();
-      setActiveTab('riwayat');
-      loadRiwayat();
     } catch (err) {
       setApiError(err.response?.data?.error || 'Gagal membuat pesanan');
     } finally {
@@ -109,17 +112,42 @@ export default function BookingPage() {
 
       {activeTab === 'pesan' && (
         <section className="card max-w-lg mx-auto lg:mx-0">
-          {isSuccess && (
-            <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded-xl flex gap-3 mb-5">
-              <CheckCircle2 size={24} className="flex-shrink-0" />
-              <div>
-                <p className="font-bold text-sm">Pesanan Berhasil!</p>
-                <p className="text-xs mt-1">Tim kami akan segera menghubungi Anda untuk konfirmasi jadwal.</p>
+          {isSuccess && latestBooking ? (
+            <div className="text-center py-6">
+              <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 size={32} />
+              </div>
+              <h3 className="font-bold text-lg text-gray-800 mb-2">Pesanan Berhasil!</h3>
+              <p className="text-sm text-gray-500 mb-6">
+                Pesanan {LAYANAN_OPTIONS.find(l => l.value === latestBooking.jenisLayanan)?.label} untuk tanggal {formatTanggal(latestBooking.tanggal)} jam {latestBooking.jam} sedang menunggu konfirmasi.
+              </p>
+              
+              <div className="space-y-3 max-w-xs mx-auto">
+                <a 
+                  href={`https://wa.me/6281234567890?text=Halo%20Admin%20Nata%2C%20saya%20ingin%20mengkonfirmasi%20pesanan%20${LAYANAN_OPTIONS.find(l => l.value === latestBooking.jenisLayanan)?.label}%20untuk%20tanggal%20${formatTanggal(latestBooking.tanggal)}%20jam%20${latestBooking.jam}.`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 w-full py-3 bg-[#25D366] text-white rounded-xl text-sm font-bold hover:bg-[#1ebd5c] transition-colors shadow-sm"
+                >
+                  <MessageCircle size={18} /> Lanjutkan ke WhatsApp
+                </a>
+                
+                <button
+                  onClick={() => {
+                    setIsSuccess(false);
+                    setLatestBooking(null);
+                    reset();
+                    setActiveTab('riwayat');
+                  }}
+                  className="w-full py-3 bg-gray-50 text-gray-600 rounded-xl text-sm font-bold hover:bg-gray-100 transition-colors"
+                >
+                  Lihat Riwayat Pesanan
+                </button>
               </div>
             </div>
-          )}
-
-          {apiError && (
+          ) : (
+            <>
+              {apiError && (
             <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-4">
               {apiError}
             </div>
@@ -204,7 +232,9 @@ export default function BookingPage() {
                 {isLoading ? 'Memproses...' : 'Pesan Sekarang'}
               </button>
             </div>
-          </form>
+            </form>
+            </>
+          )}
         </section>
       )}
 
@@ -229,6 +259,17 @@ export default function BookingPage() {
                   </div>
                   {getStatusBadge(item.status)}
                 </div>
+                
+                {item.status === 'MENUNGGU_KONFIRMASI' && (
+                  <a 
+                    href={`https://wa.me/6281234567890?text=Halo%20Admin%20Nata%2C%20saya%20ingin%20mengkonfirmasi%20pesanan%20${LAYANAN_OPTIONS.find(l => l.value === item.jenisLayanan)?.label}%20untuk%20tanggal%20${formatTanggal(item.tanggal)}%20jam%20${item.jam}.`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-1.5 w-full py-2 bg-green-50 text-green-700 rounded-lg text-xs font-bold hover:bg-green-100 transition-colors mb-3"
+                  >
+                    <MessageCircle size={14} /> Hubungi Admin via WA
+                  </a>
+                )}
                 
                 {item.keluhanScreening && (
                   <div className="bg-gray-50 p-2.5 rounded-lg mb-3">

@@ -1,39 +1,25 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bell, CheckCircle2, Calendar as CalendarIcon, Info } from 'lucide-react';
 import AppShell from '../../components/layout/AppShell';
 import PageHeader from '../../components/layout/PageHeader';
 import { formatTanggal } from '../../utils/formatters';
-
-// MOCK DATA for now, until backend notification is ready
-const MOCK_NOTIFIKASI = [
-  {
-    id: 1,
-    type: 'BOOKING_CONFIRMED',
-    title: 'Booking Dikonfirmasi',
-    message: 'Pesanan Pijat Hamil Anda untuk tanggal 25 Sep 2026 jam 10:00 telah dikonfirmasi oleh admin.',
-    createdAt: new Date().toISOString(),
-    isRead: false
-  },
-  {
-    id: 2,
-    type: 'JADWAL_IMUNISASI',
-    title: 'Pengingat Imunisasi',
-    message: 'Jangan lupa jadwal imunisasi DPT 1 untuk Nata pada tanggal 28 Sep 2026.',
-    createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-    isRead: true
-  },
-  {
-    id: 3,
-    type: 'INFO',
-    title: 'Artikel Baru Tersedia',
-    message: 'Cek artikel terbaru kami tentang "Pentingnya Pijat Laktasi Bagi Ibu Menyusui".',
-    createdAt: new Date(Date.now() - 86400000 * 3).toISOString(), // 3 days ago
-    isRead: true
-  }
-];
+import { getNotifikasi, markAsRead } from '../../api/notifikasiApi';
 
 export default function NotifikasiPage() {
-  const [notifs, setNotifs] = useState(MOCK_NOTIFIKASI);
+  const [notifs, setNotifs] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const loadData = () => {
+    setIsLoading(true);
+    getNotifikasi()
+      .then(res => setNotifs(res.data.data || []))
+      .catch(() => setNotifs([]))
+      .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const getIcon = (type) => {
     switch (type) {
@@ -57,8 +43,25 @@ export default function NotifikasiPage() {
     }
   };
 
-  const markAllAsRead = () => {
-    setNotifs(notifs.map(n => ({ ...n, isRead: true })));
+  const handleMarkAsRead = async (id) => {
+    try {
+      await markAsRead(id);
+      loadData();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const markAllAsRead = async () => {
+    const unread = notifs.filter(n => !n.isRead);
+    for (const notif of unread) {
+      try {
+        await markAsRead(notif.id);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    loadData();
   };
 
   const unreadCount = notifs.filter(n => !n.isRead).length;
@@ -79,7 +82,11 @@ export default function NotifikasiPage() {
       </div>
 
       <div className="space-y-3">
-        {notifs.length === 0 ? (
+        {isLoading ? (
+          [1, 2, 3].map(i => (
+            <div key={i} className="h-24 bg-gray-100 rounded-xl animate-pulse"></div>
+          ))
+        ) : notifs.length === 0 ? (
           <div className="text-center py-10">
             <Bell size={40} className="text-gray-300 mx-auto mb-3" />
             <p className="text-sm text-gray-500">Belum ada notifikasi.</p>
@@ -88,21 +95,22 @@ export default function NotifikasiPage() {
           notifs.map(notif => (
             <div 
               key={notif.id} 
-              className={`card flex gap-4 p-4 transition-colors ${notif.isRead ? 'opacity-70 bg-white' : 'bg-primary-50 border border-primary-100'}`}
+              onClick={() => !notif.isRead && handleMarkAsRead(notif.id)}
+              className={`card flex gap-4 p-4 transition-colors ${!notif.isRead ? 'cursor-pointer' : ''} ${notif.isRead ? 'opacity-70 bg-white' : 'bg-primary-50 border border-primary-100'}`}
             >
-              <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center ${getBgColor(notif.type)}`}>
-                {getIcon(notif.type)}
+              <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center ${getBgColor(notif.tipe)}`}>
+                {getIcon(notif.tipe)}
               </div>
               <div className="flex-1">
                 <div className="flex justify-between items-start mb-1">
                   <h3 className={`text-sm ${notif.isRead ? 'font-semibold text-gray-700' : 'font-bold text-gray-900'}`}>
-                    {notif.title}
+                    {notif.judul}
                   </h3>
                   <span className="text-[10px] text-gray-400 whitespace-nowrap ml-2">
                     {formatTanggal(notif.createdAt)}
                   </span>
                 </div>
-                <p className="text-xs text-gray-600 leading-relaxed">{notif.message}</p>
+                <p className="text-xs text-gray-600 leading-relaxed">{notif.pesan}</p>
               </div>
             </div>
           ))

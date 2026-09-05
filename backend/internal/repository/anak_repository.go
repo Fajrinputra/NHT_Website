@@ -10,6 +10,9 @@ type AnakRepository interface {
 	FindByKlienID(klienID string) ([]models.Anak, error)
 	FindByID(id string) (*models.Anak, error)
 	Update(anak *models.Anak) error
+	GetGrafikPertumbuhan(anakID string) ([]models.GrafikPertumbuhan, error)
+	GetCatatanImunisasi(anakID string) ([]models.CatatanImunisasi, error)
+	GetHasilDenverII(anakID string) ([]models.HasilDenverII, error)
 }
 
 type anakRepository struct {
@@ -38,4 +41,22 @@ func (r *anakRepository) FindByID(id string) (*models.Anak, error) {
 
 func (r *anakRepository) Update(anak *models.Anak) error {
 	return r.db.Save(anak).Error
+}
+
+func (r *anakRepository) GetGrafikPertumbuhan(anakID string) ([]models.GrafikPertumbuhan, error) {
+	var grafik []models.GrafikPertumbuhan
+	err := r.db.Where("anak_id = ?", anakID).Order("tanggal_ukur ASC").Find(&grafik).Error
+	return grafik, err
+}
+
+func (r *anakRepository) GetCatatanImunisasi(anakID string) ([]models.CatatanImunisasi, error) {
+	var imunisasi []models.CatatanImunisasi
+	err := r.db.Where("anak_id = ?", anakID).Order("usia_rekomendasi ASC").Find(&imunisasi).Error
+	return imunisasi, err
+}
+
+func (r *anakRepository) GetHasilDenverII(anakID string) ([]models.HasilDenverII, error) {
+	var denver []models.HasilDenverII
+	err := r.db.Where("anak_id = ?", anakID).Order("tanggal_skrining DESC").Find(&denver).Error
+	return denver, err
 }

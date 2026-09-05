@@ -18,12 +18,14 @@ type BookingService interface {
 type bookingService struct {
 	bookingRepo        repository.BookingRepository
 	jadwalTersediaRepo repository.JadwalTersediaRepository
+	notifRepo          repository.NotifikasiRepository
 }
 
-func NewBookingService(bookingRepo repository.BookingRepository, jadwalTersediaRepo repository.JadwalTersediaRepository) BookingService {
+func NewBookingService(bookingRepo repository.BookingRepository, jadwalTersediaRepo repository.JadwalTersediaRepository, notifRepo repository.NotifikasiRepository) BookingService {
 	return &bookingService{
 		bookingRepo:        bookingRepo,
 		jadwalTersediaRepo: jadwalTersediaRepo,
+		notifRepo:          notifRepo,
 	}
 }
 
@@ -69,6 +71,17 @@ func (s *bookingService) CreateBooking(klienID string, req *dto.CreateBookingReq
 	// Update jadwal jika memang dari tabel
 	if tersedia {
 		_ = s.jadwalTersediaRepo.MarkAsBooked(tanggal, req.Jam)
+	}
+
+	// Trigger Notification
+	if s.notifRepo != nil {
+		_ = s.notifRepo.Create(&models.Notifikasi{
+			KlienID: klienID,
+			Judul:   "Booking Berhasil Dibuat",
+			Pesan:   "Booking layanan " + string(req.JenisLayanan) + " untuk tanggal " + req.Tanggal + " sedang menunggu konfirmasi admin. Admin akan menghubungi Anda untuk konfirmasi.",
+			Tipe:    "INFO",
+			IsRead:  false,
+		})
 	}
 
 	return booking, nil

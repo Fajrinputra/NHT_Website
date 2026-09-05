@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Clock } from 'lucide-react';
 import { getStatus } from '../../api/authApi';
 
@@ -7,17 +7,27 @@ const POLL_INTERVAL_MS = 5000;
 
 /**
  * VerificationPendingPage — halaman menunggu verifikasi admin.
- * Melakukan polling GET /auth/status setiap 5 detik.
- * Saat status berubah jadi AKTIF, otomatis redirect ke /login.
+ * Melakukan polling GET /auth/status?nomorTelepon=xxx setiap 5 detik.
+ * Saat status berubah jadi AKTIF, otomatis redirect ke /login dalam waktu maks 5 detik.
  */
 export default function VerificationPendingPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const intervalRef = useRef(null);
 
+  // Ambil nomorTelepon dari state yang dikirim RegisterPage
+  const nomorTelepon = location.state?.nomorTelepon;
+
   useEffect(() => {
+    if (!nomorTelepon) {
+      // Jika tidak ada nomorTelepon (misal akses langsung ke URL ini),
+      // tampilkan halaman tapi jangan polling karena tidak tahu siapa yang dicek
+      return;
+    }
+
     const checkStatus = async () => {
       try {
-        const res = await getStatus();
+        const res = await getStatus(nomorTelepon);
         const status = res.data.data?.statusVerifikasi;
         if (status === 'AKTIF') {
           clearInterval(intervalRef.current);
@@ -27,7 +37,7 @@ export default function VerificationPendingPage() {
           });
         }
       } catch {
-        // Token belum ada atau expired — tidak masalah, terus polling
+        // Error network — tidak masalah, terus polling
       }
     };
 
@@ -36,7 +46,7 @@ export default function VerificationPendingPage() {
     intervalRef.current = setInterval(checkStatus, POLL_INTERVAL_MS);
 
     return () => clearInterval(intervalRef.current);
-  }, [navigate]);
+  }, [navigate, nomorTelepon]);
 
   return (
     <div className="min-h-screen bg-surface flex flex-col items-center justify-between px-6 py-12">
@@ -55,10 +65,18 @@ export default function VerificationPendingPage() {
           waktu 1×24 jam.
         </p>
 
+        {nomorTelepon && (
+          <p className="mt-3 text-xs text-gray-400">
+            Nomor terdaftar: <span className="font-semibold text-gray-600">{nomorTelepon}</span>
+          </p>
+        )}
+
         {/* Polling indicator */}
         <div className="mt-8 flex items-center gap-2 text-xs text-gray-400">
           <span className="w-2 h-2 rounded-full bg-primary-400 animate-pulse" />
-          Memeriksa status secara otomatis...
+          {nomorTelepon
+            ? 'Memeriksa status secara otomatis...'
+            : 'Menunggu verifikasi dari admin...'}
         </div>
       </div>
 

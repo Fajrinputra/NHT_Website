@@ -7,7 +7,7 @@ import PageHeader from '../../components/layout/PageHeader';
 import { getAnak, createAnak } from '../../api/anakApi';
 import { formatTanggal, formatUsiaAnak } from '../../utils/formatters';
 
-export default function BayiPage() {
+export default function AnakPage() {
   const [anaks, setAnaks] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -21,10 +21,10 @@ export default function BayiPage() {
     getAnak()
       .then((res) => {
         const allAnak = res.data.data || [];
-        const bayis = allAnak.filter(a => a.tipeAnak === 'BAYI');
-        setAnaks(bayis);
-        if (bayis.length > 0 && !selectedAnakId) {
-          setSelectedAnakId(bayis[0].id);
+        const anaks = allAnak.filter(a => a.tipeAnak === 'ANAK');
+        setAnaks(anaks);
+        if (anaks.length > 0 && !selectedAnakId) {
+          setSelectedAnakId(anaks[0].id);
         }
       })
       .catch(() => setAnaks([]))
@@ -63,13 +63,13 @@ export default function BayiPage() {
       {/* Profil Anak List */}
       <section className="mt-4">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-bold text-gray-800">Profil Bayi</h2>
+          <h2 className="text-base font-bold text-gray-800">Profil Anak (≥ 24 Bulan)</h2>
           <button
             onClick={() => setIsModalOpen(true)}
             className="text-sm text-primary-600 font-medium hover:underline flex items-center gap-1"
             id="btn-tambah-anak"
           >
-            <Plus size={16} /> Tambah Bayi
+            <Plus size={16} /> Tambah Anak
           </button>
         </div>
 
@@ -82,12 +82,12 @@ export default function BayiPage() {
         ) : anaks.length === 0 ? (
           <div className="card text-center py-8">
             <Baby size={40} className="text-gray-300 mx-auto mb-3" />
-            <p className="text-sm text-gray-500">Belum ada data bayi.</p>
+            <p className="text-sm text-gray-500">Belum ada data anak.</p>
             <button
               onClick={() => setIsModalOpen(true)}
               className="mt-4 btn-outline px-6 py-2 inline-flex w-auto"
             >
-              Tambah Profil Bayi
+              Tambah Profil Anak
             </button>
           </div>
         ) : (
@@ -118,7 +118,7 @@ export default function BayiPage() {
         <section className="mt-8 space-y-3">
           <h2 className="text-base font-bold text-gray-800 mb-4">Layanan & Pemantauan</h2>
           
-          <Link to={`/bayi/pertumbuhan/${selectedAnakId}`} className="block">
+          <Link to={`/anak/pertumbuhan/${selectedAnakId}`} className="block">
             <div className="card flex items-center gap-3 hover:shadow-card-hover cursor-pointer">
               <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
                 <LineChart size={20} />
@@ -127,7 +127,7 @@ export default function BayiPage() {
             </div>
           </Link>
           
-          <Link to={`/bayi/imunisasi/${selectedAnakId}`} className="block">
+          <Link to={`/anak/imunisasi/${selectedAnakId}`} className="block">
             <div className="card flex items-center gap-3 hover:shadow-card-hover cursor-pointer">
               <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-green-500">
                 <Syringe size={20} />
@@ -136,7 +136,7 @@ export default function BayiPage() {
             </div>
           </Link>
 
-          <Link to={`/bayi/denver/${selectedAnakId}`} className="block">
+          <Link to={`/anak/denver/${selectedAnakId}`} className="block">
             <div className="card flex items-center gap-3 hover:shadow-card-hover cursor-pointer">
               <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center text-purple-500">
                 <Activity size={20} />
@@ -145,12 +145,12 @@ export default function BayiPage() {
             </div>
           </Link>
 
-          <Link to={`/bayi/catatan-harian/${selectedAnakId}`} className="block">
+          <Link to={`/anak/catatan-harian/${selectedAnakId}`} className="block">
             <div className="card flex items-center gap-3 hover:shadow-card-hover cursor-pointer">
               <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center text-primary-600">
                 <PencilLine size={20} />
               </div>
-              <span className="text-sm font-medium text-gray-800 flex-1">Catatan Harian Bayi</span>
+              <span className="text-sm font-medium text-gray-800 flex-1">Catatan Harian Anak</span>
             </div>
           </Link>
         </section>
@@ -161,7 +161,7 @@ export default function BayiPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
           <div className="bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white px-5 py-4 border-b border-gray-100 flex items-center justify-between z-10">
-              <h3 className="font-bold text-lg text-gray-800">Tambah Profil Bayi</h3>
+              <h3 className="font-bold text-lg text-gray-800">Tambah Profil Anak</h3>
               <button onClick={() => setIsModalOpen(false)} className="p-1 rounded-lg text-gray-400 hover:bg-gray-100">
                 <X size={20} />
               </button>
@@ -170,7 +170,7 @@ export default function BayiPage() {
             <div className="p-5">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div>
-                  <label className="input-label">Nama Lengkap Bayi</label>
+                  <label className="input-label">Nama Lengkap Anak</label>
                   <input
                     type="text"
                     className="input-field"

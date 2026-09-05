@@ -34,10 +34,12 @@ export default function RegisterPage() {
         nik: data.nik,
         alamat: data.alamat,
       });
-      setSuccessMsg('Pendaftaran berhasil! Silakan tunggu verifikasi admin.');
-      setTimeout(() => {
-        navigate('/login');
-      }, 3000);
+      // Langsung redirect ke halaman menunggu verifikasi
+      // Sertakan nomorTelepon di state agar bisa dipakai polling
+      navigate('/menunggu-verifikasi', {
+        replace: true,
+        state: { nomorTelepon: data.nomorTelepon },
+      });
     } catch (err) {
       setApiError(err.response?.data?.error || 'Pendaftaran gagal, coba lagi');
     } finally {
