@@ -49,11 +49,8 @@ export default function LoginPage() {
 
         {/* Logo & Brand */}
         <div className="flex flex-col items-center mb-10">
-          <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center mb-4 shadow-sm">
-            <Heart size={28} className="text-primary-600" fill="currentColor" />
-          </div>
-          <h1 className="text-2xl font-bold text-primary-600 tracking-tight">Nata House</h1>
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-[0.2em] mt-0.5">Treatment</p>
+          <img src="/logo.jpg" alt="Nata House Treatment Logo" className="w-24 h-auto object-contain mb-4 rounded-xl shadow-sm" />
+          <h1 className="text-2xl font-bold text-primary-600 tracking-tight text-center">Nata House Treatment</h1>
           <p className="text-sm text-gray-500 text-center mt-3 max-w-xs leading-relaxed">
             Masuk untuk memantau kehamilan, bayi, dan anak Anda
           </p>

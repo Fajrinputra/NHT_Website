@@ -43,9 +43,7 @@ export default function BottomNav() {
       <aside className="hidden lg:flex flex-col fixed top-0 left-0 h-full w-56 bg-white border-r border-gray-100 z-40 py-6 px-3 shadow-sm">
         {/* Logo */}
         <div className="flex items-center gap-2 px-3 mb-8">
-          <div className="w-9 h-9 rounded-xl bg-primary-100 flex items-center justify-center">
-            <Heart size={18} className="text-primary-600" fill="currentColor" />
-          </div>
+          <img src="/logo.jpg" alt="Logo" className="w-9 h-9 object-contain rounded-xl" />
           <div>
             <p className="text-sm font-bold text-primary-700 leading-tight">Nata House</p>
             <p className="text-[10px] text-gray-400 uppercase tracking-widest">Treatment</p>

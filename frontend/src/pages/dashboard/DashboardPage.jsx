@@ -67,9 +67,7 @@ export default function DashboardPage() {
       {/* Header */}
       <header className="flex items-center justify-between mb-5 lg:mb-6">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-primary-100 flex items-center justify-center lg:hidden">
-            <Heart size={16} className="text-primary-600" fill="currentColor" />
-          </div>
+          <img src="/logo.jpg" alt="Logo" className="w-9 h-9 object-contain rounded-xl lg:hidden" />
           <span className="text-base font-bold text-primary-700 lg:text-xl">Nata House</span>
         </div>
         <Link to="/notifikasi" aria-label="Notifikasi" id="btn-notifikasi">
