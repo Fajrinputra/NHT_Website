@@ -44,163 +44,130 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-white font-sans">
-      {/* LEFT SIDE - Hero Illustration (Hidden on mobile) */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-blue-50/50 flex-col justify-center items-center overflow-hidden p-12">
-        {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0">
-          <div className="absolute top-[-10%] right-[-5%] w-96 h-96 bg-primary-100/50 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-[-5%] left-[-10%] w-[500px] h-[500px] bg-blue-200/40 rounded-full blur-3xl"></div>
-        </div>
-
-        <div className="relative z-10 max-w-lg w-full text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 leading-snug mb-2">
-            Permudah interaksi antar <span className="text-orange-500">Terapis</span> dan <br/>
-            <span className="text-orange-500">Ibu & Anak</span> secara online!
-          </h1>
-        </div>
-        
-        {/* 3D Illustration */}
-        <div className="relative z-10 w-full max-w-lg aspect-square flex items-center justify-center">
-          <img 
-            src="/hero-login.jpg" 
-            alt="3D Illustration of mother and nurse" 
-            className="w-full h-full object-contain rounded-2xl shadow-xl mix-blend-multiply"
-          />
-        </div>
+    <div className="min-h-screen relative flex items-center justify-center bg-gray-50 font-sans overflow-hidden">
+      
+      {/* Blurred Background Overlay (Landing Page simulation) */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        {/* Soft abstract shapes in the background */}
+        <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-primary-100/60 rounded-full blur-[80px]"></div>
+        <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-100/60 rounded-full blur-[80px]"></div>
+        <div className="absolute top-[30%] left-[20%] w-[300px] h-[300px] bg-teal-50/50 rounded-full blur-[60px]"></div>
       </div>
 
-      {/* RIGHT SIDE - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 lg:p-20 overflow-y-auto">
-        <div className="w-full max-w-md space-y-8">
-          
-          {/* Header & Logo */}
-          <div className="text-center space-y-6">
-            <div className="flex justify-center items-center">
-              {/* Logo with mix-blend-multiply to remove white background visually */}
-              <img 
-                src="/logo.jpg" 
-                alt="Nata House Treatment" 
-                className="h-36 sm:h-44 md:h-52 object-contain mix-blend-multiply"
-              />
+      {/* Login Modal Box */}
+      <div className="relative z-10 w-full max-w-[440px] mx-4 p-8 sm:p-10 bg-white rounded-[24px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100/50 backdrop-blur-sm flex flex-col">
+        
+        {/* Logo */}
+        <div className="flex justify-center items-center mb-6">
+          <img 
+            src="/logo.jpg" 
+            alt="Nata House Treatment" 
+            className="h-28 sm:h-36 object-contain mix-blend-multiply drop-shadow-sm transition-transform hover:scale-105 duration-300"
+          />
+        </div>
+        
+        {/* Header Typography */}
+        <div className="text-center space-y-2 mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+            Welcome Back
+          </h1>
+          <p className="text-sm text-gray-500 font-medium">
+            Sign in to your Nata House account
+          </p>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          {/* API Error */}
+          {apiError && (
+            <div className="bg-red-50 border border-red-100 text-red-600 text-sm px-4 py-3 rounded-xl flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-red-500 rounded-full flex-shrink-0" />
+              {apiError}
             </div>
-            
-            <div className="space-y-2">
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
-                Hai, selamat datang kembali
-              </h2>
-              <p className="text-sm text-gray-500">
-                Baru di Nata House?{' '}
-                <Link to="/register" className="text-primary-600 font-semibold hover:underline">
-                  Daftar Gratis
-                </Link>
-              </p>
-            </div>
+          )}
+
+          {/* Nomor Telepon / Email Input */}
+          <div className="space-y-1.5">
+            <label htmlFor="nomorTelepon" className="block text-sm font-semibold text-gray-700">
+              Phone Number
+            </label>
+            <input
+              id="nomorTelepon"
+              type="tel"
+              placeholder="e.g. 081234567890"
+              className={`w-full px-4 py-3 bg-gray-50/50 border rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all ${
+                errors.nomorTelepon ? 'border-red-400 focus:border-red-400' : 'border-gray-200 focus:border-primary-500 hover:border-gray-300'
+              }`}
+              {...register('nomorTelepon', {
+                required: 'Phone number is required',
+                minLength: { value: 10, message: 'Minimum 10 digits required' },
+              })}
+            />
+            {errors.nomorTelepon && (
+              <p className="text-xs text-red-500 ml-1 font-medium">{errors.nomorTelepon.message}</p>
+            )}
           </div>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            {/* API Error */}
-            {apiError && (
-              <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl">
-                {apiError}
-              </div>
-            )}
-
-            {/* Nomor Telepon */}
-            <div>
-              <input
-                id="nomorTelepon"
-                type="tel"
-                placeholder="Contoh: 081234567890"
-                className={`w-full px-4 py-3.5 bg-white border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all ${
-                  errors.nomorTelepon ? 'border-red-400 focus:border-red-400' : 'border-gray-200 focus:border-primary-500 hover:border-gray-300'
-                }`}
-                {...register('nomorTelepon', {
-                  required: 'Nomor telepon wajib diisi',
-                  minLength: { value: 10, message: 'Nomor telepon minimal 10 digit' },
-                })}
-              />
-              {errors.nomorTelepon && (
-                <p className="text-xs text-red-500 mt-1.5 ml-1 font-medium">{errors.nomorTelepon.message}</p>
-              )}
-            </div>
-
-            {/* Kata Sandi */}
-            <div>
-              <div className="relative">
-                <input
-                  id="kataSandi"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Masukkan kata sandi kamu"
-                  className={`w-full px-4 py-3.5 bg-white border rounded-xl text-sm pr-12 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all ${
-                    errors.kataSandi ? 'border-red-400 focus:border-red-400' : 'border-gray-200 focus:border-primary-500 hover:border-gray-300'
-                  }`}
-                  {...register('kataSandi', {
-                    required: 'Kata sandi wajib diisi',
-                  })}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                  aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-              {errors.kataSandi && (
-                <p className="text-xs text-red-500 mt-1.5 ml-1 font-medium">{errors.kataSandi.message}</p>
-              )}
-            </div>
-
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between pt-1">
-              <label className="flex items-center gap-2 cursor-pointer group">
-                <input 
-                  type="checkbox" 
-                  className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500 cursor-pointer"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                />
-                <span className="text-sm text-gray-600 select-none group-hover:text-gray-800 transition-colors">Ingat perangkat ini</span>
+          {/* Password Input */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label htmlFor="kataSandi" className="block text-sm font-semibold text-gray-700">
+                Password
               </label>
-              <Link to="/lupa-sandi" className="text-sm text-primary-600 font-medium hover:underline hover:text-primary-700 transition-colors">
-                Lupa kata sandi?
+              <Link to="/lupa-sandi" className="text-xs text-primary-600 font-semibold hover:text-primary-700 transition-colors">
+                Forgot?
               </Link>
             </div>
-
-            {/* Submit Button */}
-            <div className="pt-2">
+            <div className="relative">
+              <input
+                id="kataSandi"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••••••"
+                className={`w-full px-4 py-3 bg-gray-50/50 border rounded-xl text-sm pr-12 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all tracking-widest ${
+                  errors.kataSandi ? 'border-red-400 focus:border-red-400' : 'border-gray-200 focus:border-primary-500 hover:border-gray-300'
+                }`}
+                {...register('kataSandi', {
+                  required: 'Password is required',
+                })}
+              />
               <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3.5 rounded-xl transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
-                id="btn-masuk"
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {isLoading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                    Masuk...
-                  </span>
-                ) : 'Masuk'}
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
-          </form>
-
-          {/* Terms & Privacy */}
-          <div className="pt-4 text-xs text-gray-500 leading-relaxed text-center lg:text-left">
-            Dengan melanjutkan, kamu menerima{' '}
-            <Link to="/syarat" className="text-primary-600 font-semibold hover:underline">
-              Syarat Penggunaan
-            </Link>{' '}
-            dan{' '}
-            <Link to="/privasi" className="text-primary-600 font-semibold hover:underline">
-              Kebijakan Privasi
-            </Link>{' '}
-            kami.
+            {errors.kataSandi && (
+              <p className="text-xs text-red-500 ml-1 font-medium">{errors.kataSandi.message}</p>
+            )}
           </div>
 
+          {/* Submit Button */}
+          <div className="pt-4">
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-3.5 rounded-xl transition-all shadow-[0_4px_14px_0_rgba(13,148,136,0.39)] hover:shadow-[0_6px_20px_rgba(13,148,136,0.23)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+              id="btn-masuk"
+            >
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  Signing in...
+                </span>
+              ) : 'Sign In'}
+            </button>
+          </div>
+        </form>
+
+        {/* Footer */}
+        <div className="mt-8 text-center text-sm text-gray-500">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-primary-600 font-semibold hover:underline">
+            Sign Up
+          </Link>
         </div>
       </div>
     </div>
