@@ -20,14 +20,21 @@ func SetupRouter() *gin.Engine {
 	klienRepo := repository.NewKlienRepository(database.DB)
 	ibuRepo := repository.NewIbuRepository(database.DB)
 	artikelRepo := repository.NewArtikelRepository(database.DB)
+	anakRepo := repository.NewAnakRepository(database.DB)
+	bookingRepo := repository.NewBookingRepository(database.DB)
+	jadwalTersediaRepo := repository.NewJadwalTersediaRepository(database.DB)
 
 	authSvc := service.NewAuthService(klienRepo)
 	ibuHamilSvc := service.NewIbuHamilService(ibuRepo)
 	artikelSvc := service.NewArtikelService(artikelRepo)
+	anakSvc := service.NewAnakService(anakRepo)
+	bookingSvc := service.NewBookingService(bookingRepo, jadwalTersediaRepo)
 
 	authHandler := handler.NewAuthHandler(authSvc)
 	ibuHamilHandler := handler.NewIbuHamilHandler(ibuHamilSvc)
 	artikelHandler := handler.NewArtikelHandler(artikelSvc)
+	anakHandler := handler.NewAnakHandler(anakSvc)
+	bookingHandler := handler.NewBookingHandler(bookingSvc)
 
 	// API v1 group
 	v1 := r.Group("/api/v1")
@@ -58,6 +65,16 @@ func SetupRouter() *gin.Engine {
 			// Artikel (bisa diakses oleh klien terautentikasi)
 			protected.GET("/artikel", artikelHandler.GetArtikels)
 			protected.GET("/artikel/:id", artikelHandler.GetArtikelByID)
+
+			// Anak (Bayi & Anak)
+			protected.POST("/anak", anakHandler.CreateAnak)
+			protected.GET("/anak", anakHandler.GetAnak)
+			protected.PUT("/anak/:id", anakHandler.UpdateAnak)
+
+			// Booking Homecare
+			protected.POST("/booking", bookingHandler.CreateBooking)
+			protected.GET("/booking", bookingHandler.GetBookingHistory)
+			protected.GET("/booking/jadwal", bookingHandler.GetJadwalTersedia)
 		}
 	}
 

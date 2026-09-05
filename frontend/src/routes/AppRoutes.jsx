@@ -12,6 +12,12 @@ import DashboardPage from '../pages/dashboard/DashboardPage';
 // Ibu Hamil
 import IbuHamilPage from '../pages/ibu-hamil/IbuHamilPage';
 
+// Anak & Bayi
+import BayiPage from '../pages/bayi/BayiPage';
+
+// Booking Homecare
+import BookingPage from '../pages/booking/BookingPage';
+
 // Placeholder pages (dibuat session berikutnya)
 const ComingSoon = ({ name }) => (
   <div className="min-h-screen bg-surface flex items-center justify-center">
@@ -30,9 +36,9 @@ export default function AppRoutes() {
       {/* Protected */}
       <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
       <Route path="/ibu-hamil" element={<ProtectedRoute><IbuHamilPage /></ProtectedRoute>} />
-      <Route path="/bayi" element={<ProtectedRoute><ComingSoon name="Bayi" /></ProtectedRoute>} />
-      <Route path="/anak" element={<ProtectedRoute><ComingSoon name="Anak" /></ProtectedRoute>} />
-      <Route path="/booking" element={<ProtectedRoute><ComingSoon name="Booking Homecare" /></ProtectedRoute>} />
+      <Route path="/bayi" element={<ProtectedRoute><BayiPage /></ProtectedRoute>} />
+      <Route path="/anak" element={<ProtectedRoute><BayiPage /></ProtectedRoute>} />
+      <Route path="/booking" element={<ProtectedRoute><BookingPage /></ProtectedRoute>} />
       <Route path="/artikel" element={<ProtectedRoute><ComingSoon name="Artikel" /></ProtectedRoute>} />
       <Route path="/artikel/:id" element={<ProtectedRoute><ComingSoon name="Detail Artikel" /></ProtectedRoute>} />
       <Route path="/notifikasi" element={<ProtectedRoute><ComingSoon name="Notifikasi" /></ProtectedRoute>} />
