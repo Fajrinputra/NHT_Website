@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Heart, Baby, User, Smile, MessageCircle, Instagram } from 'lucide-react';
+import { Home, Heart, Baby, User, Smile, MessageCircle } from 'lucide-react';
+import InstagramIcon from '../icons/InstagramIcon';
 import { INSTAGRAM_URL, LINK_WA_KONTAK } from '../../constants/sosialMedia';
 
 const navItems = [
@@ -84,7 +85,7 @@ export default function BottomNav() {
             rel="noopener noreferrer"
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-pink-50 hover:text-pink-600 transition-all"
           >
-            <Instagram size={18} />
+            <InstagramIcon size={18} />
             Instagram
           </a>
           <a

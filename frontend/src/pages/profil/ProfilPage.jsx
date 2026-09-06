@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, LogOut, Lock, Phone, CreditCard, ChevronRight, Users, Baby, HandHeart, LogIn, MessageCircle, Instagram } from 'lucide-react';
+import { User, LogOut, Lock, Phone, CreditCard, ChevronRight, Users, Baby, HandHeart, LogIn, MessageCircle } from 'lucide-react';
+import InstagramIcon from '../../components/icons/InstagramIcon';
 import { useAuth } from '../../hooks/useAuth';
 import AppShell from '../../components/layout/AppShell';
 import PageHeader from '../../components/layout/PageHeader';
@@ -187,7 +188,7 @@ export default function ProfilPage() {
           >
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-pink-50 flex items-center justify-center text-pink-500">
-                <Instagram size={16} />
+                <InstagramIcon size={16} />
               </div>
               <div>
                 <span className="text-sm font-medium text-gray-700 block">Instagram</span>

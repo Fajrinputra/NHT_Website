@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Bell, Heart, Baby, Smile, CalendarDays, Search, ChevronRight, BookOpen, MessageCircle, Instagram } from 'lucide-react';
+import { Bell, Heart, Baby, Smile, CalendarDays, Search, ChevronRight, BookOpen, MessageCircle } from 'lucide-react';
+import InstagramIcon from '../../components/icons/InstagramIcon';
 import { useAuth } from '../../hooks/useAuth';
 import { getArtikels } from '../../api/artikelApi';
 import AppShell from '../../components/layout/AppShell';
@@ -210,7 +211,7 @@ export default function DashboardPage() {
             id="btn-instagram"
           >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF] flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
-              <Instagram size={20} className="text-white" />
+              <InstagramIcon size={20} className="text-white" />
             </div>
             <div>
               <p className="text-xs font-bold text-gray-800">Instagram</p>
