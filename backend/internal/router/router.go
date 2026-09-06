@@ -26,8 +26,15 @@ func SetupRouter() *gin.Engine {
 	catatanHarianRepo := repository.NewCatatanHarianRepository(database.DB)
 	notifRepo := repository.NewNotifikasiRepository(database.DB)
 	suamiRepo := repository.NewSuamiRepository(database.DB)
+	adminRepo := repository.NewAdminRepository()
+
+	terapisRepo := repository.NewTerapisRepository(database.DB)
 
 	authSvc := service.NewAuthService(klienRepo)
+	adminAuthSvc := service.NewAdminAuthService(adminRepo)
+	adminDashboardSvc := service.NewAdminDashboardService()
+	terapisSvc := service.NewTerapisService(terapisRepo)
+
 	ibuHamilSvc := service.NewIbuHamilService(ibuRepo)
 	artikelSvc := service.NewArtikelService(artikelRepo)
 	anakSvc := service.NewAnakService(anakRepo)
@@ -36,7 +43,13 @@ func SetupRouter() *gin.Engine {
 	notifSvc := service.NewNotifikasiService(notifRepo)
 	profilSvc := service.NewProfilService(klienRepo, ibuRepo, suamiRepo, anakRepo)
 
+	adminKlienSvc := service.NewAdminKlienService(klienRepo, profilSvc)
 	authHandler := handler.NewAuthHandler(authSvc)
+	adminAuthHandler := handler.NewAdminAuthHandler(adminAuthSvc)
+	adminDashboardHandler := handler.NewAdminDashboardHandler(adminDashboardSvc)
+	adminKlienHandler := handler.NewAdminKlienHandler(adminKlienSvc)
+	adminTerapisHandler := handler.NewAdminTerapisHandler(terapisSvc)
+
 	ibuHamilHandler := handler.NewIbuHamilHandler(ibuHamilSvc)
 	artikelHandler := handler.NewArtikelHandler(artikelSvc)
 	anakHandler := handler.NewAnakHandler(anakSvc)
@@ -100,6 +113,34 @@ func SetupRouter() *gin.Engine {
 
 			// Profil
 			protected.GET("/profil", profilHandler.GetProfil)
+		}
+
+		// Admin routes
+		adminGroup := v1.Group("/admin")
+		{
+			// Admin Auth (Public)
+			adminAuth := adminGroup.Group("/auth")
+			{
+				adminAuth.POST("/login", adminAuthHandler.Login)
+			}
+
+			// Admin Protected Routes
+			adminProtected := adminGroup.Group("")
+			adminProtected.Use(middleware.AdminAuthMiddleware())
+			{
+				// Dashboard
+				adminProtected.GET("/dashboard/stats", adminDashboardHandler.GetStats)
+
+				// Manajemen Klien
+				adminProtected.GET("/klien", adminKlienHandler.GetKliens)
+				adminProtected.GET("/klien/:id", adminKlienHandler.GetKlienDetail)
+				adminProtected.PUT("/klien/:id/verifikasi", adminKlienHandler.UpdateVerifikasi)
+
+				// Manajemen Terapis
+				adminProtected.GET("/terapis", adminTerapisHandler.GetAll)
+				adminProtected.POST("/terapis", adminTerapisHandler.Create)
+				adminProtected.PUT("/terapis/:id", adminTerapisHandler.Update)
+			}
 		}
 	}
 

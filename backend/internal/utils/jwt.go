@@ -8,7 +8,9 @@ import (
 )
 
 type Claims struct {
-	KlienID string `json:"klienId"`
+	KlienID string `json:"klienId,omitempty"`
+	AdminID string `json:"adminId,omitempty"`
+	Role    string `json:"role,omitempty"`
 	jwt.RegisteredClaims
 }
 
@@ -23,6 +25,22 @@ func InitJWT(secret string) {
 func GenerateToken(klienID string) (string, error) {
 	claims := Claims{
 		KlienID: klienID,
+		Role:    "klien",
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * 7 * time.Hour)), // 7 days
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtSecret)
+}
+
+// GenerateAdminToken creates a signed JWT token for an admin
+func GenerateAdminToken(adminID string) (string, error) {
+	claims := Claims{
+		AdminID: adminID,
+		Role:    "admin",
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * 7 * time.Hour)), // 7 days
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

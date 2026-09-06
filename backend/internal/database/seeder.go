@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/nata-house/backend/internal/models"
+	"github.com/nata-house/backend/internal/utils"
 )
 
 // SeedKIAData menyuntikkan data dummy untuk modul Anak (KIA Digital)
@@ -63,4 +64,33 @@ func SeedKIAData() {
 		Bahasa:          models.HasilDenverPerluPerhatian,
 		PersonalSosial:  models.HasilDenverSesuaiUsia,
 	})
+}
+
+// SeedAdmin membuat akun super admin jika belum ada
+func SeedAdmin() {
+	var count int64
+	DB.Model(&models.Admin{}).Count(&count)
+	if count > 0 {
+		return // Admin sudah ada
+	}
+
+	defaultPassword := "admin123nata" // Tampilkan di log sesuai instruksi
+	hashed, _ := utils.HashPassword(defaultPassword)
+
+	admin := models.Admin{
+		Nama:          "Super Admin",
+		Email:         "admin@natahouse.com",
+		KataSandiHash: hashed,
+	}
+
+	if err := DB.Create(&admin).Error; err != nil {
+		log.Printf("Gagal membuat akun admin default: %v\n", err)
+	} else {
+		log.Printf("===================================================\n")
+		log.Printf("AKUN ADMIN DEFAULT BERHASIL DIBUAT!\n")
+		log.Printf("Email    : %s\n", admin.Email)
+		log.Printf("Password : %s\n", defaultPassword)
+		log.Printf("Harap segera ganti password ini sebelum produksi.\n")
+		log.Printf("===================================================\n")
+	}
 }

@@ -29,6 +29,7 @@ func Connect(databaseURL string) {
 
 	// AutoMigrate semua 13 tabel
 	err = DB.AutoMigrate(
+		&models.Admin{},
 		&models.Klien{},
 		&models.Terapis{},
 		&models.Ibu{},
@@ -47,5 +48,5 @@ func Connect(databaseURL string) {
 		log.Fatalf("Gagal migrasi database: %v", err)
 	}
 
-	log.Println("Migrasi database berhasil — 13 tabel siap")
+	log.Println("Migrasi database berhasil — 14 tabel siap")
 }

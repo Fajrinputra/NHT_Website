@@ -29,6 +29,7 @@ func main() {
 
 	// Seed data (khusus development/testing)
 	database.SeedKIAData()
+	database.SeedAdmin()
 
 	// Setup router dan jalankan server
 	r := router.SetupRouter()
