@@ -37,4 +37,23 @@ export const adminTerapisApi = {
   update: (id, data) => adminApi.put(`/terapis/${id}`, data),
 };
 
+export const adminArtikelApi = {
+  getAll: () => adminApi.get('/artikel'),
+  create: (data) => adminApi.post('/artikel', data),
+  update: (id, data) => adminApi.put(`/artikel/${id}`, data),
+  delete: (id) => adminApi.delete(`/artikel/${id}`),
+};
+
+export const adminJadwalApi = {
+  getByTanggal: (tanggal) => adminApi.get(`/jadwal?tanggal=${tanggal}`),
+  create: (data) => adminApi.post('/jadwal', data),
+  toggle: (id, tersedia) => adminApi.put(`/jadwal/${id}/toggle`, { tersedia }),
+};
+
+export const adminBookingApi = {
+  getAll: (status = '') => adminApi.get(`/booking${status ? `?status=${status}` : ''}`),
+  getById: (id) => adminApi.get(`/booking/${id}`),
+  update: (id, data) => adminApi.put(`/booking/${id}`, data),
+};
+
 export default adminApi;

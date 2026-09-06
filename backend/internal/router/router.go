@@ -33,6 +33,9 @@ func SetupRouter() *gin.Engine {
 	authSvc := service.NewAuthService(klienRepo)
 	adminAuthSvc := service.NewAdminAuthService(adminRepo)
 	adminDashboardSvc := service.NewAdminDashboardService()
+	adminArtikelSvc := service.NewAdminArtikelService(artikelRepo)
+	adminJadwalSvc := service.NewAdminJadwalService(jadwalRepo)
+	adminBookingSvc := service.NewAdminBookingService(bookingRepo, terapisRepo)
 	terapisSvc := service.NewTerapisService(terapisRepo)
 
 	ibuHamilSvc := service.NewIbuHamilService(ibuRepo)
@@ -49,6 +52,9 @@ func SetupRouter() *gin.Engine {
 	adminDashboardHandler := handler.NewAdminDashboardHandler(adminDashboardSvc)
 	adminKlienHandler := handler.NewAdminKlienHandler(adminKlienSvc)
 	adminTerapisHandler := handler.NewAdminTerapisHandler(terapisSvc)
+	adminArtikelHandler := handler.NewAdminArtikelHandler(adminArtikelSvc)
+	adminJadwalHandler := handler.NewAdminJadwalHandler(adminJadwalSvc)
+	adminBookingHandler := handler.NewAdminBookingHandler(adminBookingSvc)
 
 	ibuHamilHandler := handler.NewIbuHamilHandler(ibuHamilSvc)
 	artikelHandler := handler.NewArtikelHandler(artikelSvc)
@@ -140,6 +146,22 @@ func SetupRouter() *gin.Engine {
 				adminProtected.GET("/terapis", adminTerapisHandler.GetAll)
 				adminProtected.POST("/terapis", adminTerapisHandler.Create)
 				adminProtected.PUT("/terapis/:id", adminTerapisHandler.Update)
+
+				// Manajemen Artikel
+				adminProtected.GET("/artikel", adminArtikelHandler.GetAll)
+				adminProtected.POST("/artikel", adminArtikelHandler.Create)
+				adminProtected.PUT("/artikel/:id", adminArtikelHandler.Update)
+				adminProtected.DELETE("/artikel/:id", adminArtikelHandler.Delete)
+
+				// Manajemen Jadwal
+				adminProtected.GET("/jadwal", adminJadwalHandler.GetJadwalByTanggal)
+				adminProtected.POST("/jadwal", adminJadwalHandler.Create)
+				adminProtected.PUT("/jadwal/:id/toggle", adminJadwalHandler.Toggle)
+
+				// Manajemen Booking
+				adminProtected.GET("/booking", adminBookingHandler.GetAll)
+				adminProtected.GET("/booking/:id", adminBookingHandler.GetByID)
+				adminProtected.PUT("/booking/:id", adminBookingHandler.Update)
 			}
 		}
 	}

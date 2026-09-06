@@ -12,6 +12,9 @@ type ArtikelRepository interface {
 	Search(query string) ([]models.Artikel, error)
 	FindAll() ([]models.Artikel, error)
 	FindWithFilters(query string, kategori string) ([]models.Artikel, error)
+	Create(artikel *models.Artikel) error
+	Update(artikel *models.Artikel) error
+	Delete(id string) error
 }
 
 type artikelRepository struct {
@@ -73,3 +76,16 @@ func (r *artikelRepository) FindWithFilters(query string, kategori string) ([]mo
 	err := db.Order("created_at DESC").Find(&artikels).Error
 	return artikels, err
 }
+
+func (r *artikelRepository) Create(artikel *models.Artikel) error {
+	return r.db.Create(artikel).Error
+}
+
+func (r *artikelRepository) Update(artikel *models.Artikel) error {
+	return r.db.Save(artikel).Error
+}
+
+func (r *artikelRepository) Delete(id string) error {
+	return r.db.Delete(&models.Artikel{}, "id = ?", id).Error
+}
+

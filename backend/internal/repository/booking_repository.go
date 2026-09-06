@@ -9,6 +9,7 @@ type BookingRepository interface {
 	Create(booking *models.Booking) error
 	FindByKlienID(klienID string) ([]models.Booking, error)
 	FindByID(id string) (*models.Booking, error)
+	FindAll(status string) ([]models.Booking, error)
 	Update(booking *models.Booking) error
 }
 
@@ -38,4 +39,16 @@ func (r *bookingRepository) FindByID(id string) (*models.Booking, error) {
 
 func (r *bookingRepository) Update(booking *models.Booking) error {
 	return r.db.Save(booking).Error
+}
+
+func (r *bookingRepository) FindAll(status string) ([]models.Booking, error) {
+	var bookings []models.Booking
+	db := r.db.Preload("Klien").Preload("Terapis")
+	
+	if status != "" && status != "SEMUA" {
+		db = db.Where("status = ?", status)
+	}
+	
+	err := db.Order("created_at DESC").Find(&bookings).Error
+	return bookings, err
 }

@@ -10,7 +10,10 @@ import (
 type JadwalTersediaRepository interface {
 	FindTersediaByBulan(tahun int, bulan int) ([]models.JadwalTersedia, error)
 	FindTersediaByTanggal(tanggal time.Time) ([]models.JadwalTersedia, error)
+	FindAllByTanggal(tanggal time.Time) ([]models.JadwalTersedia, error)
 	MarkAsBooked(tanggal time.Time, jam string) error
+	Create(jadwal *models.JadwalTersedia) error
+	ToggleTersedia(id string, tersedia bool) error
 }
 
 type jadwalTersediaRepository struct {
@@ -37,8 +40,24 @@ func (r *jadwalTersediaRepository) FindTersediaByTanggal(tanggal time.Time) ([]m
 	return jadwals, err
 }
 
+func (r *jadwalTersediaRepository) FindAllByTanggal(tanggal time.Time) ([]models.JadwalTersedia, error) {
+	var jadwals []models.JadwalTersedia
+	err := r.db.Where("tanggal = ?", tanggal).Order("jam ASC").Find(&jadwals).Error
+	return jadwals, err
+}
+
 func (r *jadwalTersediaRepository) MarkAsBooked(tanggal time.Time, jam string) error {
 	return r.db.Model(&models.JadwalTersedia{}).
 		Where("tanggal = ? AND jam = ?", tanggal, jam).
 		Update("tersedia", false).Error
+}
+
+func (r *jadwalTersediaRepository) Create(jadwal *models.JadwalTersedia) error {
+	return r.db.Create(jadwal).Error
+}
+
+func (r *jadwalTersediaRepository) ToggleTersedia(id string, tersedia bool) error {
+	return r.db.Model(&models.JadwalTersedia{}).
+		Where("id = ?", id).
+		Update("tersedia", tersedia).Error
 }

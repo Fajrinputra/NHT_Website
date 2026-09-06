@@ -1,14 +1,45 @@
-import { useState, useEffect } from 'react';
-import { adminDashboardApi } from './../../api/adminApi';
-import { UsersIcon, UserGroupIcon, CalendarIcon, ClipboardDocumentListIcon } from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
+import { adminDashboardApi, adminBookingApi } from './../../api/adminApi';
+import { UsersIcon, UserGroupIcon, CalendarIcon, ClipboardDocumentListIcon, EyeIcon } from '@heroicons/react/24/outline';
+
+const STATUS_COLORS = {
+  MENUNGGU_KONFIRMASI: 'bg-yellow-100 text-yellow-800',
+  DIKONFIRMASI: 'bg-green-100 text-green-800',
+  SELESAI: 'bg-blue-100 text-blue-800',
+  DITOLAK: 'bg-red-100 text-red-800',
+  DIBATALKAN: 'bg-gray-100 text-gray-800',
+};
+
+const STATUS_LABELS = {
+  MENUNGGU_KONFIRMASI: 'Menunggu',
+  DIKONFIRMASI: 'Dikonfirmasi',
+  SELESAI: 'Selesai',
+  DITOLAK: 'Ditolak',
+  DIBATALKAN: 'Dibatalkan',
+};
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [recentBookings, setRecentBookings] = useState([]);
+
   useEffect(() => {
     fetchStats();
+    fetchRecentBookings();
   }, []);
+
+  const fetchRecentBookings = async () => {
+    try {
+      const response = await adminBookingApi.getAll();
+      if (response.data.success) {
+        // Take the top 5 recent bookings
+        setRecentBookings((response.data.data || []).slice(0, 5));
+      }
+    } catch (error) {
+      console.error('Failed to fetch recent bookings', error);
+    }
+  };
 
   const fetchStats = async () => {
     try {
@@ -62,13 +93,48 @@ export default function AdminDashboardPage() {
       <div className="mt-8 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-lg font-bold text-gray-800">Booking Terbaru</h3>
-          <button className="text-sm text-primary font-medium hover:underline">Lihat Semua</button>
+          <Link to="/admin/booking" className="text-sm text-primary font-medium hover:underline">Lihat Semua</Link>
         </div>
-        <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-          <CalendarIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500 font-medium">Modul Manajemen Booking Belum Diimplementasikan</p>
-          <p className="text-sm text-gray-400 mt-1">Daftar booking akan muncul di sini setelah API Booking Admin selesai.</p>
-        </div>
+        
+        {recentBookings.length === 0 ? (
+          <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+            <CalendarIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <p className="text-gray-500 font-medium">Belum ada booking terbaru</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm whitespace-nowrap">
+              <thead className="bg-gray-50 text-gray-600 font-medium border-b border-gray-100">
+                <tr>
+                  <th className="px-4 py-3">Klien</th>
+                  <th className="px-4 py-3">Layanan</th>
+                  <th className="px-4 py-3">Tanggal & Jam</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Aksi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {recentBookings.map((booking) => (
+                  <tr key={booking.id} className="hover:bg-gray-50/50">
+                    <td className="px-4 py-3 font-medium text-gray-900">{booking.namaKlien}</td>
+                    <td className="px-4 py-3 text-gray-600">{booking.jenisLayanan.replace('_', ' ')}</td>
+                    <td className="px-4 py-3 text-gray-600">{booking.tanggal} <span className="font-mono">{booking.jam}</span></td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${STATUS_COLORS[booking.status]}`}>
+                        {STATUS_LABELS[booking.status]}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link to={`/admin/booking/${booking.id}`} className="text-primary hover:bg-primary/10 p-1 rounded transition-colors inline-block">
+                        <EyeIcon className="w-4 h-4" />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

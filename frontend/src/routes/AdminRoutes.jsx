@@ -9,6 +9,11 @@ import KlienListPage from '../pages/admin/klien/KlienListPage';
 import KlienDetailPage from '../pages/admin/klien/KlienDetailPage';
 import TerapisListPage from '../pages/admin/terapis/TerapisListPage';
 import TerapisFormPage from '../pages/admin/terapis/TerapisFormPage';
+import ArtikelListPage from '../pages/admin/artikel/ArtikelListPage';
+import ArtikelFormPage from '../pages/admin/artikel/ArtikelFormPage';
+import JadwalPage from '../pages/admin/jadwal/JadwalPage';
+import BookingListPage from '../pages/admin/booking/BookingListPage';
+import BookingDetailPage from '../pages/admin/booking/BookingDetailPage';
 
 const ComingSoonAdmin = ({ title }) => (
   <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center min-h-[400px] flex flex-col items-center justify-center">
@@ -35,9 +40,14 @@ export default function AdminRoutes() {
         <Route path="/terapis/tambah" element={<TerapisFormPage mode="create" />} />
         <Route path="/terapis/:id/edit" element={<TerapisFormPage mode="edit" />} />
         
-        <Route path="/artikel" element={<ComingSoonAdmin title="Manajemen Artikel" />} />
-        <Route path="/jadwal" element={<ComingSoonAdmin title="Manajemen Jadwal" />} />
-        <Route path="/booking" element={<ComingSoonAdmin title="Manajemen Booking" />} />
+        <Route path="/artikel" element={<ArtikelListPage />} />
+        <Route path="/artikel/tambah" element={<ArtikelFormPage mode="create" />} />
+        <Route path="/artikel/:id/edit" element={<ArtikelFormPage mode="edit" />} />
+        
+        <Route path="/jadwal" element={<JadwalPage />} />
+        
+        <Route path="/booking" element={<BookingListPage />} />
+        <Route path="/booking/:id" element={<BookingDetailPage />} />
         
         <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
       </Route>
