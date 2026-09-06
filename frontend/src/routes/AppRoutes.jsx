@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
+import AdminRoutes from './AdminRoutes';
 
 // Auth pages
 import LoginPage from '../pages/auth/LoginPage';
@@ -71,6 +72,9 @@ export default function AppRoutes() {
       <Route path="/artikel/:id" element={<ProtectedRoute><ArtikelDetailPage /></ProtectedRoute>} />
       <Route path="/notifikasi" element={<ProtectedRoute><NotifikasiPage /></ProtectedRoute>} />
       <Route path="/profil" element={<ProtectedRoute><ProfilPage /></ProtectedRoute>} />
+
+      {/* Admin Panel */}
+      <Route path="/admin/*" element={<AdminRoutes />} />
 
       {/* Redirect root */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
