@@ -29,4 +29,17 @@ export const terapisKunjunganApi = {
   getRiwayatKlien: (klienId) => terapisApi.get(`/klien/${klienId}/riwayat-kesehatan`),
 };
 
+export const terapisInputApi = {
+  tambahGrafikPertumbuhan: (anakId, data) => terapisApi.post(`/anak/${anakId}/grafik-pertumbuhan`, data),
+  updateImunisasi: (imunisasiId, data) => terapisApi.put(`/imunisasi/${imunisasiId}`, data),
+  tambahDenverII: (anakId, data) => terapisApi.post(`/anak/${anakId}/denver-ii`, data),
+  selesaikanKunjungan: (bookingId, data) => terapisApi.put(`/booking/${bookingId}/selesai`, data),
+  tandaiRujukan: (bookingId, data) => terapisApi.put(`/booking/${bookingId}/rujukan`, data),
+};
+
+export const terapisProfilApi = {
+  getProfil: () => terapisApi.get('/profil'),
+  gantiKataSandi: (data) => terapisApi.put('/profil/kata-sandi', data),
+};
+
 export default terapisApi;

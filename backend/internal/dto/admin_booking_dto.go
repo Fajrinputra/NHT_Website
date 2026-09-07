@@ -18,5 +18,7 @@ type AdminBookingResponse struct {
 	KeluhanScreening string  `json:"keluhanScreening"`
 	Status           string  `json:"status"`
 	CatatanTerapis   string  `json:"catatanTerapis"`
+	PerluRujukan     bool    `json:"perluRujukan"`
+	CatatanRujukan   string  `json:"catatanRujukan"`
 	CreatedAt        string  `json:"createdAt"`
 }

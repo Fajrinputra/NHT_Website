@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { terapisKunjunganApi } from '../../../api/terapisApi';
-import { ArrowLeftIcon, ClockIcon, CalendarIcon, UserIcon, DocumentTextIcon, ClipboardDocumentCheckIcon } from '@heroicons/react/24/outline';
+import { terapisKunjunganApi, terapisInputApi } from '../../../api/terapisApi';
+import { ArrowLeftIcon, ClockIcon, CalendarIcon, UserIcon, DocumentTextIcon, ClipboardDocumentCheckIcon, CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 export default function DetailKunjunganPage() {
   const { id } = useParams();
@@ -9,6 +9,8 @@ export default function DetailKunjunganPage() {
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [catatan, setCatatan] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchDetail();
@@ -24,6 +26,26 @@ export default function DetailKunjunganPage() {
       setError(err.response?.data?.error || 'Gagal memuat detail kunjungan');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSelesaikan = async () => {
+    if (!catatan.trim()) {
+      alert('Mohon isi catatan kunjungan');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await terapisInputApi.selesaikanKunjungan(id, { catatanTerapis: catatan });
+      if (response.data.success) {
+        alert('Kunjungan berhasil ditandai selesai');
+        navigate('/terapis/jadwal');
+      }
+    } catch (err) {
+      alert(err.response?.data?.error || 'Gagal menyelesaikan kunjungan');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -106,13 +128,41 @@ export default function DetailKunjunganPage() {
         </Link>
 
         {booking.status === 'DIKONFIRMASI' && (
-          <button
-            className="flex items-center justify-center gap-2 w-full py-4 bg-primary text-white rounded-xl font-bold shadow-md shadow-primary/20 active:bg-primary-dark transition-all"
-            onClick={() => alert('Fitur Input Hasil (Terapis Prompt 2) akan dibangun di sesi berikutnya')}
-          >
-            <ClipboardDocumentCheckIcon className="w-5 h-5" />
-            Mulai / Input Hasil Kunjungan
-          </button>
+          <>
+            <Link
+              to={`/terapis/booking/${booking.id}/input?anakId=${booking.klienId}`} // Asumsi sederhana: anak pertama. Idealnya dari halaman riwayat.
+              className="flex items-center justify-center gap-2 w-full py-4 bg-primary text-white rounded-xl font-bold shadow-md shadow-primary/20 active:bg-primary-dark transition-all"
+            >
+              <ClipboardDocumentCheckIcon className="w-5 h-5" />
+              Mulai / Input Hasil Kunjungan
+            </Link>
+
+            <Link
+              to={`/terapis/booking/${booking.id}/rujukan`}
+              className="flex items-center justify-center gap-2 w-full py-4 bg-red-50 border border-red-200 text-red-600 rounded-xl font-bold shadow-sm active:bg-red-100 transition-colors mt-2"
+            >
+              <ExclamationTriangleIcon className="w-5 h-5" />
+              Laporkan Perlu Rujukan
+            </Link>
+
+            <div className="mt-8 border-t border-gray-200 pt-6 space-y-4">
+              <h4 className="font-bold text-gray-800">Tandai Kunjungan Selesai</h4>
+              <textarea
+                value={catatan}
+                onChange={(e) => setCatatan(e.target.value)}
+                placeholder="Tulis ringkasan hasil tindakan / terapi di sini..."
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl p-4 min-h-[120px] focus:ring-2 focus:ring-primary focus:border-primary transition-all text-sm"
+              />
+              <button
+                onClick={handleSelesaikan}
+                disabled={isSubmitting}
+                className="flex items-center justify-center gap-2 w-full py-4 bg-green-500 text-white rounded-xl font-bold shadow-md shadow-green-500/20 active:bg-green-600 disabled:opacity-50 transition-all"
+              >
+                <CheckCircleIcon className="w-5 h-5" />
+                {isSubmitting ? 'Menyimpan...' : 'Tandai Kunjungan Selesai'}
+              </button>
+            </div>
+          </>
         )}
       </div>
 

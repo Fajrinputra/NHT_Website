@@ -28,6 +28,8 @@ type Booking struct {
 	KeluhanScreening string        `gorm:"type:text" json:"keluhanScreening"`
 	Status           StatusBooking `gorm:"type:varchar(30);not null;default:'MENUNGGU_KONFIRMASI'" json:"status"`
 	CatatanTerapis   string        `gorm:"type:text" json:"catatanTerapis"`
+	PerluRujukan     bool          `gorm:"default:false" json:"perluRujukan"`
+	CatatanRujukan   string        `gorm:"type:text" json:"catatanRujukan"`
 	CreatedAt        time.Time     `json:"createdAt"`
 	UpdatedAt        time.Time     `json:"updatedAt"`
 

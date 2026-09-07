@@ -28,6 +28,10 @@ func SetupRouter() *gin.Engine {
 	suamiRepo := repository.NewSuamiRepository(database.DB)
 	adminRepo := repository.NewAdminRepository()
 
+	grafikRepo := repository.NewGrafikPertumbuhanRepository(database.DB)
+	imunisasiRepo := repository.NewCatatanImunisasiRepository(database.DB)
+	denverRepo := repository.NewHasilDenverIIRepository(database.DB)
+
 	terapisRepo := repository.NewTerapisRepository(database.DB)
 
 	authSvc := service.NewAuthService(klienRepo)
@@ -39,6 +43,7 @@ func SetupRouter() *gin.Engine {
 	terapisSvc := service.NewTerapisService(terapisRepo)
 	terapisAuthSvc := service.NewTerapisAuthService(terapisRepo)
 	terapisKunjunganSvc := service.NewTerapisKunjunganService(bookingRepo, klienRepo, ibuRepo, anakRepo)
+	terapisInputSvc := service.NewTerapisInputService(terapisRepo, bookingRepo, anakRepo, grafikRepo, imunisasiRepo, denverRepo)
 
 	ibuHamilSvc := service.NewIbuHamilService(ibuRepo)
 	artikelSvc := service.NewArtikelService(artikelRepo)
@@ -60,6 +65,7 @@ func SetupRouter() *gin.Engine {
 	
 	terapisAuthHandler := handler.NewTerapisAuthHandler(terapisAuthSvc)
 	terapisKunjunganHandler := handler.NewTerapisKunjunganHandler(terapisKunjunganSvc)
+	terapisInputHandler := handler.NewTerapisInputHandler(terapisInputSvc)
 
 	ibuHamilHandler := handler.NewIbuHamilHandler(ibuHamilSvc)
 	artikelHandler := handler.NewArtikelHandler(artikelSvc)
@@ -185,6 +191,19 @@ func SetupRouter() *gin.Engine {
 				terapisProtected.GET("/jadwal-kunjungan", terapisKunjunganHandler.GetJadwalKunjungan)
 				terapisProtected.GET("/booking/:id", terapisKunjunganHandler.GetDetailKunjungan)
 				terapisProtected.GET("/klien/:klienId/riwayat-kesehatan", terapisKunjunganHandler.GetRiwayatKesehatanKlien)
+
+				// Input Medis
+				terapisProtected.POST("/anak/:anakId/grafik-pertumbuhan", terapisInputHandler.TambahGrafikPertumbuhan)
+				terapisProtected.PUT("/imunisasi/:id", terapisInputHandler.UpdateImunisasi)
+				terapisProtected.POST("/anak/:anakId/denver-ii", terapisInputHandler.TambahDenverII)
+				
+				// Selesaikan & Rujukan
+				terapisProtected.PUT("/booking/:id/selesai", terapisInputHandler.SelesaikanKunjungan)
+				terapisProtected.PUT("/booking/:id/rujukan", terapisInputHandler.TandaiRujukan)
+
+				// Profil
+				terapisProtected.GET("/profil", terapisInputHandler.GetProfilTerapis)
+				terapisProtected.PUT("/profil/kata-sandi", terapisInputHandler.GantiKataSandi)
 			}
 		}
 	}

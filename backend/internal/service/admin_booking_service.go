@@ -106,6 +106,8 @@ func (s *adminBookingService) toAdminResponse(b *models.Booking) dto.AdminBookin
 		KeluhanScreening: b.KeluhanScreening,
 		Status:           string(b.Status),
 		CatatanTerapis:   b.CatatanTerapis,
+		PerluRujukan:     b.PerluRujukan,
+		CatatanRujukan:   b.CatatanRujukan,
 		CreatedAt:        b.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
 	}
 }

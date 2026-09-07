@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { adminBookingApi } from '../../../api/adminApi';
-import { EyeIcon } from '@heroicons/react/24/outline';
+import { EyeIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 const STATUS_COLORS = {
   MENUNGGU_KONFIRMASI: 'bg-yellow-100 text-yellow-800',
@@ -99,11 +99,18 @@ export default function BookingListPage() {
                       {booking.tanggal} <span className="font-mono bg-gray-100 px-1 rounded">{booking.jam}</span>
                     </td>
                     <td className="px-6 py-4">
-                      {booking.namaTerapis !== '-' ? (
-                        <span className="font-medium text-primary">{booking.namaTerapis}</span>
-                      ) : (
-                        <span className="text-gray-400 italic">Belum ditugaskan</span>
-                      )}
+                      <div className="flex flex-col items-start gap-1">
+                        {booking.namaTerapis !== '-' ? (
+                          <span className="font-medium text-primary">{booking.namaTerapis}</span>
+                        ) : (
+                          <span className="text-gray-400 italic">Belum ditugaskan</span>
+                        )}
+                        {booking.perluRujukan && (
+                          <span className="flex items-center gap-1 text-[10px] font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded border border-red-200">
+                            <ExclamationTriangleIcon className="w-3 h-3" /> PERLU RUJUKAN
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${STATUS_COLORS[booking.status]}`}>
