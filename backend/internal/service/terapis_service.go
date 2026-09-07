@@ -2,10 +2,13 @@ package service
 
 import (
 	"errors"
+	"math/rand"
+	"time"
 
 	"github.com/nata-house/backend/internal/dto"
 	"github.com/nata-house/backend/internal/models"
 	"github.com/nata-house/backend/internal/repository"
+	"github.com/nata-house/backend/internal/utils"
 )
 
 type TerapisService interface {
@@ -41,10 +44,24 @@ func (s *terapisService) GetAll() ([]*dto.TerapisResponse, error) {
 }
 
 func (s *terapisService) Create(req *dto.CreateTerapisRequest) (*dto.TerapisResponse, error) {
+	password := req.KataSandi
+	generated := ""
+
+	if password == "" {
+		password = generateRandomPassword(8)
+		generated = password
+	}
+
+	hashedPassword, err := utils.HashPassword(password)
+	if err != nil {
+		return nil, errors.New("gagal memproses kata sandi")
+	}
+
 	terapis := &models.Terapis{
-		Nama:         req.Nama,
-		NomorTelepon: req.NomorTelepon,
-		Aktif:        true,
+		Nama:          req.Nama,
+		NomorTelepon:  req.NomorTelepon,
+		KataSandiHash: hashedPassword,
+		Aktif:         true,
 	}
 
 	if err := s.terapisRepo.Create(terapis); err != nil {
@@ -52,11 +69,22 @@ func (s *terapisService) Create(req *dto.CreateTerapisRequest) (*dto.TerapisResp
 	}
 
 	return &dto.TerapisResponse{
-		ID:           terapis.ID,
-		Nama:         terapis.Nama,
-		NomorTelepon: terapis.NomorTelepon,
-		Aktif:        terapis.Aktif,
+		ID:                 terapis.ID,
+		Nama:               terapis.Nama,
+		NomorTelepon:       terapis.NomorTelepon,
+		Aktif:              terapis.Aktif,
+		KataSandiGenerated: generated,
 	}, nil
+}
+
+func generateRandomPassword(length int) string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[seededRand.Intn(len(charset))]
+	}
+	return string(b)
 }
 
 func (s *terapisService) Update(id string, req *dto.UpdateTerapisRequest) (*dto.TerapisResponse, error) {

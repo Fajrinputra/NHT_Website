@@ -11,10 +11,12 @@ export default function TerapisFormPage({ mode = 'create' }) {
   const [formData, setFormData] = useState({
     nama: '',
     nomorTelepon: '',
+    kataSandi: '',
     aktif: true,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [generatedPassword, setGeneratedPassword] = useState('');
 
   useEffect(() => {
     if (mode === 'edit') {
@@ -35,7 +37,11 @@ export default function TerapisFormPage({ mode = 'create' }) {
 
     try {
       if (mode === 'create') {
-        await adminTerapisApi.create(formData);
+        const response = await adminTerapisApi.create(formData);
+        if (response.data?.data?.kataSandiGenerated) {
+          setGeneratedPassword(response.data.data.kataSandiGenerated);
+          return; // Don't navigate away yet, show the password
+        }
       } else {
         await adminTerapisApi.update(id, formData);
       }
@@ -44,6 +50,10 @@ export default function TerapisFormPage({ mode = 'create' }) {
       setError(err.response?.data?.message || `Gagal ${mode === 'create' ? 'menambah' : 'menyimpan'} data terapis`);
       setLoading(false);
     }
+  };
+
+  const closePasswordModal = () => {
+    navigate('/admin/terapis');
   };
 
   return (
@@ -89,6 +99,20 @@ export default function TerapisFormPage({ mode = 'create' }) {
             />
           </div>
 
+          {mode === 'create' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Kata Sandi Awal (Opsional)</label>
+              <input
+                type="text"
+                value={formData.kataSandi}
+                onChange={(e) => setFormData({ ...formData, kataSandi: e.target.value })}
+                className="w-full px-4 py-3 bg-gray-50 border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                placeholder="Kosongkan untuk generate otomatis"
+              />
+              <p className="text-xs text-gray-500 mt-1">Jika dikosongkan, sistem akan membuatkan kata sandi acak.</p>
+            </div>
+          )}
+
           {mode === 'edit' && (
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
               <div>
@@ -124,6 +148,27 @@ export default function TerapisFormPage({ mode = 'create' }) {
           </div>
         </form>
       </div>
+
+      {generatedPassword && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden shadow-xl p-6">
+            <h3 className="font-bold text-gray-800 text-lg mb-2">Terapis Berhasil Ditambahkan</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Karena Anda tidak memasukkan kata sandi, sistem telah membuat kata sandi acak berikut. 
+              <strong>Harap simpan dan berikan kepada terapis</strong>, karena kata sandi ini tidak akan ditampilkan lagi.
+            </p>
+            <div className="bg-gray-100 p-4 rounded-xl text-center mb-6">
+              <span className="font-mono text-xl font-bold tracking-widest text-gray-800">{generatedPassword}</span>
+            </div>
+            <button
+              onClick={closePasswordModal}
+              className="w-full py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-dark transition-all"
+            >
+              Saya Mengerti, Kembali ke Daftar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

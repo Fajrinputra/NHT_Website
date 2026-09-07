@@ -8,9 +8,10 @@ import (
 )
 
 type Claims struct {
-	KlienID string `json:"klienId,omitempty"`
-	AdminID string `json:"adminId,omitempty"`
-	Role    string `json:"role,omitempty"`
+	KlienID   string `json:"klienId,omitempty"`
+	AdminID   string `json:"adminId,omitempty"`
+	TerapisID string `json:"terapisId,omitempty"`
+	Role      string `json:"role,omitempty"`
 	jwt.RegisteredClaims
 }
 
@@ -41,6 +42,21 @@ func GenerateAdminToken(adminID string) (string, error) {
 	claims := Claims{
 		AdminID: adminID,
 		Role:    "admin",
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * 7 * time.Hour)), // 7 days
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	return token.SignedString(jwtSecret)
+}
+
+// GenerateTerapisToken creates a signed JWT token for a terapis
+func GenerateTerapisToken(terapisID string) (string, error) {
+	claims := Claims{
+		TerapisID: terapisID,
+		Role:      "terapis",
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * 7 * time.Hour)), // 7 days
 			IssuedAt:  jwt.NewNumericDate(time.Now()),

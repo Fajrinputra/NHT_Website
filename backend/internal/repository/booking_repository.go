@@ -8,6 +8,7 @@ import (
 type BookingRepository interface {
 	Create(booking *models.Booking) error
 	FindByKlienID(klienID string) ([]models.Booking, error)
+	FindByTerapisID(terapisID string, status string) ([]models.Booking, error)
 	FindByID(id string) (*models.Booking, error)
 	FindAll(status string) ([]models.Booking, error)
 	Update(booking *models.Booking) error
@@ -28,6 +29,18 @@ func (r *bookingRepository) Create(booking *models.Booking) error {
 func (r *bookingRepository) FindByKlienID(klienID string) ([]models.Booking, error) {
 	var bookings []models.Booking
 	err := r.db.Preload("Terapis").Where("klien_id = ?", klienID).Order("tanggal DESC, jam DESC").Find(&bookings).Error
+	return bookings, err
+}
+
+func (r *bookingRepository) FindByTerapisID(terapisID string, status string) ([]models.Booking, error) {
+	var bookings []models.Booking
+	db := r.db.Preload("Klien").Where("terapis_id = ?", terapisID)
+	
+	if status != "" {
+		db = db.Where("status = ?", status)
+	}
+	
+	err := db.Order("created_at DESC").Find(&bookings).Error
 	return bookings, err
 }
 

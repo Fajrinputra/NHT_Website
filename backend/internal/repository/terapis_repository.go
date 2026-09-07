@@ -8,6 +8,7 @@ import (
 type TerapisRepository interface {
 	FindAll() ([]*models.Terapis, error)
 	FindByID(id string) (*models.Terapis, error)
+	FindByNomorTelepon(nomorTelepon string) (*models.Terapis, error)
 	Create(terapis *models.Terapis) error
 	Update(terapis *models.Terapis) error
 }
@@ -29,6 +30,15 @@ func (r *terapisRepository) FindAll() ([]*models.Terapis, error) {
 func (r *terapisRepository) FindByID(id string) (*models.Terapis, error) {
 	var terapis models.Terapis
 	err := r.db.First(&terapis, "id = ?", id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &terapis, nil
+}
+
+func (r *terapisRepository) FindByNomorTelepon(nomorTelepon string) (*models.Terapis, error) {
+	var terapis models.Terapis
+	err := r.db.First(&terapis, "nomor_telepon = ?", nomorTelepon).Error
 	if err != nil {
 		return nil, err
 	}

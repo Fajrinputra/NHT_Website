@@ -37,6 +37,8 @@ func SetupRouter() *gin.Engine {
 	adminJadwalSvc := service.NewAdminJadwalService(jadwalRepo)
 	adminBookingSvc := service.NewAdminBookingService(bookingRepo, terapisRepo)
 	terapisSvc := service.NewTerapisService(terapisRepo)
+	terapisAuthSvc := service.NewTerapisAuthService(terapisRepo)
+	terapisKunjunganSvc := service.NewTerapisKunjunganService(bookingRepo, klienRepo, ibuRepo, anakRepo, bayiRepo)
 
 	ibuHamilSvc := service.NewIbuHamilService(ibuRepo)
 	artikelSvc := service.NewArtikelService(artikelRepo)
@@ -55,6 +57,9 @@ func SetupRouter() *gin.Engine {
 	adminArtikelHandler := handler.NewAdminArtikelHandler(adminArtikelSvc)
 	adminJadwalHandler := handler.NewAdminJadwalHandler(adminJadwalSvc)
 	adminBookingHandler := handler.NewAdminBookingHandler(adminBookingSvc)
+	
+	terapisAuthHandler := handler.NewTerapisAuthHandler(terapisAuthSvc)
+	terapisKunjunganHandler := handler.NewTerapisKunjunganHandler(terapisKunjunganSvc)
 
 	ibuHamilHandler := handler.NewIbuHamilHandler(ibuHamilSvc)
 	artikelHandler := handler.NewArtikelHandler(artikelSvc)
@@ -164,7 +169,24 @@ func SetupRouter() *gin.Engine {
 				adminProtected.PUT("/booking/:id", adminBookingHandler.Update)
 			}
 		}
-	}
 
+		// ==========================================
+		// TERAPIS ROUTES
+		// ==========================================
+		terapisGroup := v1.Group("/terapis")
+		{
+			// Auth
+			terapisGroup.POST("/auth/login", terapisAuthHandler.Login)
+
+			// Protected routes
+			terapisProtected := terapisGroup.Group("")
+			terapisProtected.Use(middleware.TerapisAuthMiddleware())
+			{
+				terapisProtected.GET("/jadwal-kunjungan", terapisKunjunganHandler.GetJadwalKunjungan)
+				terapisProtected.GET("/booking/:id", terapisKunjunganHandler.GetDetailKunjungan)
+				terapisProtected.GET("/klien/:klienId/riwayat-kesehatan", terapisKunjunganHandler.GetRiwayatKesehatanKlien)
+			}
+		}
+	}
 	return r
 }

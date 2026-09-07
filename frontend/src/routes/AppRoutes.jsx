@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import AdminRoutes from './AdminRoutes';
+import TerapisRoutes from './TerapisRoutes';
 
 // Auth pages
 import LoginPage from '../pages/auth/LoginPage';
@@ -75,6 +76,9 @@ export default function AppRoutes() {
 
       {/* Admin Panel */}
       <Route path="/admin/*" element={<AdminRoutes />} />
+
+      {/* Terapis Panel */}
+      <Route path="/terapis/*" element={<TerapisRoutes />} />
 
       {/* Redirect root */}
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
