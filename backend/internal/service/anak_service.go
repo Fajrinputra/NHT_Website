@@ -7,6 +7,7 @@ import (
 	"github.com/nata-house/backend/internal/dto"
 	"github.com/nata-house/backend/internal/models"
 	"github.com/nata-house/backend/internal/repository"
+	"github.com/nata-house/backend/internal/utils"
 )
 
 type AnakService interface {
@@ -37,9 +38,9 @@ func (s *anakService) CreateAnak(klienID string, req *dto.CreateAnakRequest) (*d
 		Nama:               req.Nama,
 		TanggalLahir:       tanggalLahir,
 		JenisKelamin:       models.JenisKelamin(req.JenisKelamin),
-		BeratLahir:         req.BeratLahir,
-		PanjangLahir:       req.PanjangLahir,
-		LingkarKepalaLahir: req.LingkarKepalaLahir,
+		BeratLahir:         &req.BeratLahir,
+		PanjangLahir:       &req.PanjangLahir,
+		LingkarKepalaLahir: &req.LingkarKepalaLahir,
 	}
 
 	if err := s.anakRepo.Create(anak); err != nil {

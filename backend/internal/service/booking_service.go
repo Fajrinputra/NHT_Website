@@ -79,8 +79,6 @@ func (s *bookingService) CreateBooking(klienID string, req *dto.CreateBookingReq
 			KlienID: klienID,
 			Judul:   "Booking Berhasil Dibuat",
 			Pesan:   "Booking layanan " + string(req.JenisLayanan) + " untuk tanggal " + req.Tanggal + " sedang menunggu konfirmasi admin. Admin akan menghubungi Anda untuk konfirmasi.",
-			Tipe:    "INFO",
-			IsRead:  false,
 		})
 	}
 

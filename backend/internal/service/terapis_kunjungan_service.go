@@ -6,6 +6,7 @@ import (
 	"github.com/nata-house/backend/internal/dto"
 	"github.com/nata-house/backend/internal/models"
 	"github.com/nata-house/backend/internal/repository"
+	"github.com/nata-house/backend/internal/utils"
 )
 
 type TerapisKunjunganService interface {
@@ -15,26 +16,23 @@ type TerapisKunjunganService interface {
 }
 
 type terapisKunjunganService struct {
-	bookingRepo   repository.BookingRepository
-	klienRepo     repository.KlienRepository
-	ibuHamilRepo  repository.IbuHamilRepository
-	anakRepo      repository.AnakRepository
-	bayiRepo      repository.BayiRepository
+	bookingRepo  repository.BookingRepository
+	klienRepo    repository.KlienRepository
+	ibuRepo      repository.IbuRepository
+	anakRepo     repository.AnakRepository
 }
 
 func NewTerapisKunjunganService(
 	bookingRepo repository.BookingRepository,
 	klienRepo repository.KlienRepository,
-	ibuHamilRepo repository.IbuHamilRepository,
+	ibuRepo repository.IbuRepository,
 	anakRepo repository.AnakRepository,
-	bayiRepo repository.BayiRepository,
 ) TerapisKunjunganService {
 	return &terapisKunjunganService{
-		bookingRepo:  bookingRepo,
-		klienRepo:    klienRepo,
-		ibuHamilRepo: ibuHamilRepo,
-		anakRepo:     anakRepo,
-		bayiRepo:     bayiRepo,
+		bookingRepo: bookingRepo,
+		klienRepo:   klienRepo,
+		ibuRepo:     ibuRepo,
+		anakRepo:    anakRepo,
 	}
 }
 
@@ -48,7 +46,7 @@ func (s *terapisKunjunganService) GetJadwalKunjungan(terapisID string, status st
 	for _, b := range bookings {
 		responses = append(responses, s.toKunjunganResponse(&b))
 	}
-	
+
 	if responses == nil {
 		responses = []dto.TerapisKunjunganResponse{}
 	}
@@ -71,13 +69,12 @@ func (s *terapisKunjunganService) GetDetailKunjungan(terapisID string, bookingID
 }
 
 func (s *terapisKunjunganService) GetRiwayatKesehatanKlien(terapisID string, klienID string) (*dto.TerapisRiwayatKesehatanKlienResponse, error) {
-	// 1. Verify that this Terapis has a booking with this Klien to ensure authorization
-	// For simplicity, we assume they can view if they have the klienID, but ideally we check if they had a booking
+	// 1. Verifikasi Terapis memiliki booking dengan Klien ini
 	bookings, err := s.bookingRepo.FindByKlienID(klienID)
 	if err != nil {
 		return nil, errors.New("klien tidak ditemukan")
 	}
-	
+
 	hasAccess := false
 	for _, b := range bookings {
 		if b.TerapisID != nil && *b.TerapisID == terapisID {
@@ -85,7 +82,7 @@ func (s *terapisKunjunganService) GetRiwayatKesehatanKlien(terapisID string, kli
 			break
 		}
 	}
-	
+
 	if !hasAccess {
 		return nil, errors.New("akses ditolak: Anda tidak memiliki riwayat penanganan klien ini")
 	}
@@ -101,18 +98,32 @@ func (s *terapisKunjunganService) GetRiwayatKesehatanKlien(terapisID string, kli
 	}
 
 	// Ambil data Ibu Hamil
-	if ibuHamil, _ := s.ibuHamilRepo.FindByKlienID(klienID); ibuHamil != nil {
+	if ibuHamil, _ := s.ibuRepo.FindByKlienID(klienID); ibuHamil != nil {
 		res.IbuHamil = ibuHamil
 	}
 
-	// Ambil data Bayi
-	if bayiList, _ := s.bayiRepo.FindByKlienID(klienID); len(bayiList) > 0 {
-		res.Bayi = bayiList
-	}
+	// Ambil semua data Anak dari SATU tabel (tidak ada BayiRepository terpisah).
+	// Klasifikasikan menjadi "Bayi" (< 24 bulan) dan "Anak" (>= 24 bulan)
+	// berdasarkan usia yang dihitung secara real-time dari TanggalLahir.
+	if semuaAnak, _ := s.anakRepo.FindByKlienID(klienID); len(semuaAnak) > 0 {
+		var daftarBayi []models.Anak
+		var daftarAnak []models.Anak
 
-	// Ambil data Anak
-	if anakList, _ := s.anakRepo.FindByKlienID(klienID); len(anakList) > 0 {
-		res.Anak = anakList
+		for _, a := range semuaAnak {
+			usiaBulan := utils.HitungUsiaAnak(a.TanggalLahir)
+			if usiaBulan < 24 {
+				daftarBayi = append(daftarBayi, a)
+			} else {
+				daftarAnak = append(daftarAnak, a)
+			}
+		}
+
+		if len(daftarBayi) > 0 {
+			res.Bayi = daftarBayi
+		}
+		if len(daftarAnak) > 0 {
+			res.Anak = daftarAnak
+		}
 	}
 
 	return res, nil

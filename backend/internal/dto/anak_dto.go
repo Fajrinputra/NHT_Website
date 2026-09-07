@@ -26,3 +26,12 @@ type AnakResponse struct {
 	TipeAnak           string     `json:"tipeAnak"` // "BAYI" (<= 12 bln) atau "ANAK" (> 12 bln)
 	CreatedAt          time.Time  `json:"createdAt"`
 }
+// UpdateAnakRequest payload untuk mengupdate data anak (semua field opsional)
+type UpdateAnakRequest struct {
+	Nama               *string  `json:"nama"`
+	TanggalLahir       *string  `json:"tanggalLahir"` // YYYY-MM-DD
+	JenisKelamin       *string  `json:"jenisKelamin"`
+	BeratLahir         *float64 `json:"beratLahir"`
+	PanjangLahir       *float64 `json:"panjangLahir"`
+	LingkarKepalaLahir *float64 `json:"lingkarKepalaLahir"`
+}

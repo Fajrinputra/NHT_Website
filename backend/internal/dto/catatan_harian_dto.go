@@ -20,3 +20,8 @@ type CatatanHarianResponse struct {
 	IsiCatatan string     `json:"isiCatatan"`
 	CreatedAt  time.Time  `json:"createdAt"`
 }
+// UpdateCatatanHarianRequest payload untuk mengupdate catatan harian (semua field opsional)
+type UpdateCatatanHarianRequest struct {
+	Tanggal    string `json:"tanggal"`    // YYYY-MM-DD
+	IsiCatatan string `json:"isiCatatan"`
+}

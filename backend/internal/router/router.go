@@ -34,11 +34,11 @@ func SetupRouter() *gin.Engine {
 	adminAuthSvc := service.NewAdminAuthService(adminRepo)
 	adminDashboardSvc := service.NewAdminDashboardService()
 	adminArtikelSvc := service.NewAdminArtikelService(artikelRepo)
-	adminJadwalSvc := service.NewAdminJadwalService(jadwalRepo)
+	adminJadwalSvc := service.NewAdminJadwalService(jadwalTersediaRepo)
 	adminBookingSvc := service.NewAdminBookingService(bookingRepo, terapisRepo)
 	terapisSvc := service.NewTerapisService(terapisRepo)
 	terapisAuthSvc := service.NewTerapisAuthService(terapisRepo)
-	terapisKunjunganSvc := service.NewTerapisKunjunganService(bookingRepo, klienRepo, ibuRepo, anakRepo, bayiRepo)
+	terapisKunjunganSvc := service.NewTerapisKunjunganService(bookingRepo, klienRepo, ibuRepo, anakRepo)
 
 	ibuHamilSvc := service.NewIbuHamilService(ibuRepo)
 	artikelSvc := service.NewArtikelService(artikelRepo)

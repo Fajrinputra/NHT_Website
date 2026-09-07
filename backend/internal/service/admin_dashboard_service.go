@@ -31,7 +31,7 @@ func (s *adminDashboardService) GetStats() (*AdminDashboardStats, error) {
 	}
 
 	// Count Klien Menunggu
-	if err := database.DB.Model(&models.Klien{}).Where("status_verifikasi = ?", models.StatusVerifikasiMenunggu).Count(&stats.KlienMenunggu).Error; err != nil {
+	if err := database.DB.Model(&models.Klien{}).Where("status_verifikasi = ?", models.StatusMenunggu).Count(&stats.KlienMenunggu).Error; err != nil {
 		return nil, err
 	}
 

@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/nata-house/backend/internal/dto"
-	"github.com/nata-house/backend/internal/models"
 	"github.com/nata-house/backend/internal/repository"
 )
 
@@ -66,7 +65,7 @@ func (s *profilService) GetProfil(klienID string) (*dto.ProfilResponse, error) {
 		resp.Keluarga = append(resp.Keluarga, dto.KeluargaResponse{
 			Peran:        "Anak",
 			Nama:         a.Nama,
-			TanggalLahir: a.TanggalLahir,
+			TanggalLahir: a.TanggalLahir.Format("2006-01-02"),
 		})
 	}
 

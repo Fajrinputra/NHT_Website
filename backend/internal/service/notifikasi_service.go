@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/nata-house/backend/internal/dto"
-	"github.com/nata-house/backend/internal/models"
 	"github.com/nata-house/backend/internal/repository"
 )
 
@@ -35,8 +34,8 @@ func (s *notifikasiService) GetNotifikasi(klienID string) ([]dto.NotifikasiRespo
 			ID:        n.ID,
 			Judul:     n.Judul,
 			Pesan:     n.Pesan,
-			Tipe:      string(n.Tipe),
-			IsRead:    n.IsRead,
+			Tipe:      "",
+			IsRead:    n.SudahDibaca,
 			CreatedAt: n.CreatedAt.Format(time.RFC3339),
 		})
 	}
