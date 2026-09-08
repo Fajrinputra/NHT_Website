@@ -81,7 +81,8 @@ export default function GrafikPertumbuhanPage() {
                   <th className="px-4 py-3">BB (kg)</th>
                   <th className="px-4 py-3">PB/TB (cm)</th>
                   <th className="px-4 py-3">LK (cm)</th>
-                  <th className="px-4 py-3 rounded-r-lg">Status</th>
+                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3 rounded-r-lg">Diisi Oleh</th>
                 </tr>
               </thead>
               <tbody>
@@ -95,6 +96,9 @@ export default function GrafikPertumbuhanPage() {
                       <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
                         {item.status}
                       </span>
+                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-500">
+                      {item.diisiOleh || '-'}
                     </td>
                   </tr>
                 ))}

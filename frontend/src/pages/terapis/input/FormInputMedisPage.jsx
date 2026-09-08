@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { terapisKunjunganApi, terapisInputApi } from '../../../api/terapisApi';
+import { getCatatanImunisasi } from '../../../api/anakApi';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 export default function FormInputMedisPage() {
@@ -17,7 +18,6 @@ export default function FormInputMedisPage() {
   const [grafik, setGrafik] = useState({ tanggalUkur: '', beratBadan: '', panjangBadan: '', lingkarKepala: '', status: '' });
   const [denver, setDenver] = useState({ motorikKasar: 'SESUAI_USIA', motorikHalus: 'SESUAI_USIA', bahasa: 'SESUAI_USIA', personalSosial: 'SESUAI_USIA' });
   
-  // Asumsikan kita butuh list imunisasi untuk di-update (sederhana: pakai ID dummy atau ambil list imunisasi dari riwayat)
   const [imunisasiList, setImunisasiList] = useState([]);
   const [selectedImunisasiId, setSelectedImunisasiId] = useState('');
   const [imunisasiForm, setImunisasiForm] = useState({ status: 'SUDAH', tanggalPemberian: '' });
@@ -27,6 +27,28 @@ export default function FormInputMedisPage() {
   useEffect(() => {
     fetchRiwayat();
   }, [id]);
+
+  useEffect(() => {
+    if (anakId) {
+      fetchImunisasi(anakId);
+    }
+  }, [anakId]);
+
+  const fetchImunisasi = async (idAnak) => {
+    try {
+      const response = await getCatatanImunisasi(idAnak);
+      if (response.data.success) {
+        setImunisasiList(response.data.data || []);
+        if (response.data.data && response.data.data.length > 0) {
+          setSelectedImunisasiId(response.data.data[0].id);
+        } else {
+          setSelectedImunisasiId('');
+        }
+      }
+    } catch (err) {
+      console.error('Gagal memuat imunisasi', err);
+    }
+  };
 
   const fetchRiwayat = async () => {
     try {
@@ -91,7 +113,7 @@ export default function FormInputMedisPage() {
 
   const handleUpdateImunisasi = async (e) => {
     e.preventDefault();
-    if (!selectedImunisasiId) return alert('Pilih imunisasi terlebih dahulu (Data imunisasi anak belum didukung secara penuh di form ini)');
+    if (!selectedImunisasiId) return alert('Pilih imunisasi terlebih dahulu');
     setIsSubmitting(true);
     try {
       await terapisInputApi.updateImunisasi(selectedImunisasiId, imunisasiForm);
@@ -193,12 +215,22 @@ export default function FormInputMedisPage() {
 
         {activeTab === 'imunisasi' && (
           <form onSubmit={handleUpdateImunisasi} className="space-y-4">
-            <div className="bg-blue-50 text-blue-800 p-4 rounded-xl text-sm mb-4">
-              <p>Untuk update imunisasi, masukkan ID Catatan Imunisasi. (Pada implementasi penuh, ini akan berupa dropdown pilihan imunisasi dari data anak tersebut).</p>
-            </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">ID Catatan Imunisasi (UUID)</label>
-              <input type="text" required value={selectedImunisasiId} onChange={e => setSelectedImunisasiId(e.target.value)} placeholder="Masukkan UUID..." className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm font-mono" />
+              <label className="block text-sm font-medium text-gray-700 mb-1">Pilih Jenis Vaksin Imunisasi</label>
+              <select 
+                required 
+                value={selectedImunisasiId} 
+                onChange={e => setSelectedImunisasiId(e.target.value)} 
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary"
+              >
+                <option value="" disabled>-- Pilih Imunisasi --</option>
+                {imunisasiList.map(item => (
+                  <option key={item.id} value={item.id}>
+                    {item.namaVaksin} (Status Saat Ini: {item.status})
+                  </option>
+                ))}
+              </select>
+              {imunisasiList.length === 0 && <p className="text-red-500 text-xs mt-1">Belum ada jadwal imunisasi terdaftar untuk anak ini.</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
