@@ -194,6 +194,7 @@ func SetupRouter() *gin.Engine {
 
 				// Input Medis
 				terapisProtected.POST("/anak/:anakId/grafik-pertumbuhan", terapisInputHandler.TambahGrafikPertumbuhan)
+				terapisProtected.GET("/anak/:anakId/imunisasi", terapisInputHandler.GetImunisasi)
 				terapisProtected.PUT("/imunisasi/:id", terapisInputHandler.UpdateImunisasi)
 				terapisProtected.POST("/anak/:anakId/denver-ii", terapisInputHandler.TambahDenverII)
 				

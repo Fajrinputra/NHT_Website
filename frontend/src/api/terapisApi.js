@@ -31,6 +31,7 @@ export const terapisKunjunganApi = {
 
 export const terapisInputApi = {
   tambahGrafikPertumbuhan: (anakId, data) => terapisApi.post(`/anak/${anakId}/grafik-pertumbuhan`, data),
+  getImunisasi: (anakId) => terapisApi.get(`/anak/${anakId}/imunisasi`),
   updateImunisasi: (imunisasiId, data) => terapisApi.put(`/imunisasi/${imunisasiId}`, data),
   tambahDenverII: (anakId, data) => terapisApi.post(`/anak/${anakId}/denver-ii`, data),
   selesaikanKunjungan: (bookingId, data) => terapisApi.put(`/booking/${bookingId}/selesai`, data),

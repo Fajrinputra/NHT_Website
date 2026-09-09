@@ -12,6 +12,7 @@ import (
 
 type TerapisInputService interface {
 	TambahGrafikPertumbuhan(terapisID, anakID string, req *dto.TambahGrafikPertumbuhanRequest) error
+	GetImunisasi(terapisID, anakID string) ([]models.CatatanImunisasi, error)
 	UpdateImunisasi(terapisID, imunisasiID string, req *dto.UpdateImunisasiRequest) error
 	TambahDenverII(terapisID, anakID string, req *dto.TambahDenverIIRequest) error
 	SelesaikanKunjungan(terapisID, bookingID string, req *dto.SelesaikanKunjunganRequest) error
@@ -94,6 +95,13 @@ func (s *terapisInputService) TambahGrafikPertumbuhan(terapisID, anakID string, 
 	}
 
 	return s.grafikRepo.Create(gp)
+}
+
+func (s *terapisInputService) GetImunisasi(terapisID, anakID string) ([]models.CatatanImunisasi, error) {
+	if err := s.verifikasiAksesAnak(terapisID, anakID); err != nil {
+		return nil, err
+	}
+	return s.anakRepo.GetCatatanImunisasi(anakID)
 }
 
 func (s *terapisInputService) UpdateImunisasi(terapisID, imunisasiID string, req *dto.UpdateImunisasiRequest) error {

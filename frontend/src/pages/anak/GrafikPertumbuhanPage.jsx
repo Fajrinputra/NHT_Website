@@ -53,10 +53,14 @@ export default function GrafikPertumbuhanPage() {
             <p className="text-gray-500">Belum ada data pertumbuhan.</p>
           </div>
         ) : (
-          <div className="h-[300px] w-full mt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
+          <>
+            <p className="text-sm text-gray-500 mb-6 px-1">
+              Pengukuran terakhir dilakukan pada <span className="font-medium text-gray-700">{data[data.length - 1]?.displayDate}</span> oleh <span className="font-medium text-gray-700">{data[data.length - 1]?.diisiOleh || '-'}</span>.
+            </p>
+            <div className="h-[300px] w-full mt-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                 <XAxis dataKey="displayDate" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} dy={10} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#6B7280' }} dx={-10} />
                 <Tooltip 
@@ -64,9 +68,10 @@ export default function GrafikPertumbuhanPage() {
                 />
                 <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
                 <Line type="monotone" name="Berat Badan (kg)" dataKey="beratBadan" stroke="#3B82F6" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </>
         )}
       </div>
 

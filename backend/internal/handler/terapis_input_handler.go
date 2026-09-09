@@ -37,6 +37,21 @@ func (h *TerapisInputHandler) TambahGrafikPertumbuhan(c *gin.Context) {
 	utils.ResponseSuccess(c, http.StatusCreated, "Berhasil menambahkan data grafik pertumbuhan", nil)
 }
 
+// GetImunisasi godoc
+// GET /api/v1/terapis/anak/:anakId/imunisasi
+func (h *TerapisInputHandler) GetImunisasi(c *gin.Context) {
+	terapisID := c.GetString("terapisId")
+	anakID := c.Param("anakId")
+
+	data, err := h.terapisInputSvc.GetImunisasi(terapisID, anakID)
+	if err != nil {
+		utils.ResponseError(c, http.StatusForbidden, err.Error())
+		return
+	}
+
+	utils.ResponseSuccess(c, http.StatusOK, "Berhasil mengambil data imunisasi", data)
+}
+
 // UpdateImunisasi godoc
 // PUT /api/v1/terapis/imunisasi/:id
 func (h *TerapisInputHandler) UpdateImunisasi(c *gin.Context) {

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { terapisKunjunganApi, terapisInputApi } from '../../../api/terapisApi';
-import { getCatatanImunisasi } from '../../../api/anakApi';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 export default function FormInputMedisPage() {
@@ -36,7 +35,7 @@ export default function FormInputMedisPage() {
 
   const fetchImunisasi = async (idAnak) => {
     try {
-      const response = await getCatatanImunisasi(idAnak);
+      const response = await terapisInputApi.getImunisasi(idAnak);
       if (response.data.success) {
         setImunisasiList(response.data.data || []);
         if (response.data.data && response.data.data.length > 0) {
